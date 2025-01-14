@@ -27,11 +27,11 @@ class MainActivity : ComponentActivity() {
             val clientSecret by preferencesViewModel.clientSecret.collectAsState(initial = null)
 
             AnitrackComposeTheme {
-                va initialRoute : String = if (clientId == null || clientSecret == null) {
-                "apiSetup"
-            } else {
-                "watchlist"
-            }
+                val initialRoute: String = if (clientId == null || clientSecret == null) {
+                    "apiSetup"
+                } else {
+                    "watchlist"
+                }
 
                 AppNavHost(
                     preferencesViewModel,
