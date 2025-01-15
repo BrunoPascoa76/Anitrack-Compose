@@ -9,6 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "cm.project.anitrack_compose"
+        manifestPlaceholders["appAuthRedirectScheme"] = "myapp"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -68,5 +69,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.appauth)
 
 }
