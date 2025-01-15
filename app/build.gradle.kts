@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "cm.project.anitrack_compose"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "cm.project.anitrack_compose"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
