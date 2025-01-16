@@ -1,8 +1,15 @@
 package cm.project.anitrack_compose.repositories
 
+import cm.project.anitrack_compose.graphql.GetMediaListQuery
+import cm.project.anitrack_compose.graphql.GetMediaListQuery.MediaListCollection
+import cm.project.anitrack_compose.graphql.GetUserIdQuery
 import cm.project.anitrack_compose.graphql.UserProfilePictureQuery
+import cm.project.anitrack_compose.graphql.type.MediaListSort
+import cm.project.anitrack_compose.graphql.type.MediaListStatus
+import cm.project.anitrack_compose.graphql.type.MediaType
 import cm.project.anitrack_compose.models.User
 import com.apollographql.apollo3.ApolloClient
+import com.apollographql.apollo3.api.Optional
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -16,6 +23,38 @@ class GraphQLRepository @Inject constructor(private val apolloClient: ApolloClie
             val response = apolloClient.query(UserProfilePictureQuery()).execute()
             val viewer = response.data?.Viewer
             Result.Success(User(viewer?.avatar?.medium ?: ""))
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+
+    suspend fun getUserId(): Result<Int> {
+        return try {
+            val response = apolloClient.query(GetUserIdQuery()).execute()
+            val viewer = response.data?.Viewer
+            Result.Success(viewer?.id ?: -1)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+
+    suspend fun getMediaList(
+        userId: Int,
+        status: MediaListStatus,
+        type: MediaType = MediaType.ANIME,
+        sort: List<MediaListSort> = listOf(MediaListSort.SCORE_DESC)
+    ): Result<MediaListCollection> {
+        return try {
+            val response = apolloClient.query(
+                GetMediaListQuery(
+                    Optional.present(userId),
+                    Optional.present(status),
+                    Optional.present(type),
+                    Optional.present(sort)
+                )
+            ).execute()
+            val mediaListCollection = response.data?.MediaListCollection
+            Result.Success(mediaListCollection!!)
         } catch (e: Exception) {
             Result.Error(e)
         }

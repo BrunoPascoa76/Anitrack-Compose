@@ -1,0 +1,18 @@
+query GetMediaList($userId: Int, $status: MediaListStatus, $type: MediaType, $sort: [MediaListSort]) {
+    MediaListCollection(userId: $userId, status: $status, type: $type, sort: $sort) {
+        lists {
+            entries {
+                media {
+                    episodes
+                    title {
+                        english
+                        native
+                    }
+                    coverImage {
+                        large
+                    }
+                }
+            }
+        }
+    }
+}
