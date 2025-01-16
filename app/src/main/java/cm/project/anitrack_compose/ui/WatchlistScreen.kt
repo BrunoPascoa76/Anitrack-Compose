@@ -94,7 +94,7 @@ fun WatchListScreen(
             contentPadding = PaddingValues(5.dp),
             modifier = Modifier.padding(5.dp),
             verticalArrangement = Arrangement.spacedBy(5.dp),
-            horizontalArrangement = Arrangement.spacedBy(5.dp)
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             items(watchlist.size) { index ->
                 val entry = watchlist[index]
