@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import cm.project.anitrack_compose.ui.APISetupScreen
 import cm.project.anitrack_compose.ui.WatchlistScreen
+import cm.project.anitrack_compose.ui.components.GraphQLWrapper
 import cm.project.anitrack_compose.viewModels.PreferencesViewModel
 
 @Composable
@@ -23,7 +24,15 @@ fun AppNavHost(
         modifier = modifier
     ) {
         composable("watchlist") {
-            WatchlistScreen(navController = navController)
+            GraphQLWrapper(preferencesViewModel) { graphQLRepository ->
+                WatchlistScreen(
+                    navController = navController,
+                    graphQLRepository = graphQLRepository
+                )
+            }
+        }
+        composable("profile") {
+
         }
         composable("apiSetup") {
             APISetupScreen(

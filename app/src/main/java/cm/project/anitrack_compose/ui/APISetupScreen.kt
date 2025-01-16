@@ -48,7 +48,7 @@ fun APISetupScreen(
 
     LaunchedEffect(clientId, clientSecret) {
         if (clientId != null && clientSecret != null) {
-            navController.navigate("auth")
+            navController.navigate("watchlist")
         }
     }
 

@@ -35,7 +35,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            val initialRoute = if (clientId != null && clientSecret != null) "auth" else "setup"
+            val initialRoute = if (clientId != null && clientSecret != null) "apiSetup" else "setup"
             setContent {
                 AnitrackComposeTheme {
                     AppNavHost(

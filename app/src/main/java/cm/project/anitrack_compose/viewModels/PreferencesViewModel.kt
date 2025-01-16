@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 class PreferencesViewModel(private val preferencesRepository: PreferencesRepository) : ViewModel() {
     val clientId = preferencesRepository.clientId
     val clientSecret = preferencesRepository.clientSecret
+    val accessToken = preferencesRepository.accessToken
 
     fun saveClientIdAndSecret(clientId: String, clientSecret: String) {
         viewModelScope.launch {

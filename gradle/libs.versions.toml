@@ -1,10 +1,13 @@
 [versions]
 agp = "8.6.1"
-apolloNormalizedCache = "4.0.0-beta.4"
-apolloRuntime = "3.8.2"
+apolloNormalizedCache = "3.8.5"
+apolloRuntime = "3.8.5"
 appauth = "0.11.1"
 coilCompose = "2.4.0"
 datastorePreferences = "1.1.1"
+hiltAndroid = "2.40.5"
+hiltAndroidVersion = "2.50"
+hiltCompiler = "2.50"
 kotlin = "1.9.0"
 coreKtx = "1.15.0"
 junit = "4.13.2"
@@ -29,6 +32,10 @@ apollo-normalized-cache = { module = "com.apollographql.apollo3:apollo-normalize
 apollo-runtime = { module = "com.apollographql.apollo3:apollo-runtime", version.ref = "apolloRuntime" }
 appauth = { module = "net.openid:appauth", version.ref = "appauth" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
+hilt-android-v250 = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroidVersion" }
+hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltAndroid" }
+hilt-compiler-v250 = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltCompiler" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

@@ -1,0 +1,7 @@
+query UserProfilePicture {
+    Viewer {
+        avatar {
+            medium
+        }
+    }
+}

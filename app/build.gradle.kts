@@ -1,7 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("com.apollographql.apollo3") version "4.0.0-beta.4"
+    id("com.apollographql.apollo3") version "3.8.5"
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -80,6 +82,8 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.apollo.normalized.cache)
     implementation(libs.apollo.http.cache)
+    implementation(libs.hilt.android.v250)
+    kapt(libs.hilt.compiler.v250)
 }
 
 apollo {
