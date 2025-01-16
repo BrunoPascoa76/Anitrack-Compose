@@ -2,8 +2,8 @@ package cm.project.anitrack_compose.ui.components
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -27,21 +27,29 @@ fun BottomNavBar(navController: NavController) {
 
     NavigationBar {
         NavigationBarItem(
-            icon = { Icon(Icons.Filled.CalendarMonth, contentDescription = "Watchlist") },
+            icon = { Icon(Icons.Filled.Visibility, contentDescription = "Watchlist") },
             label = { Text("Watchlist") },
             selected = currentRoute == "watchlist",
             onClick = {
                 navController.navigate("watchlist")
             }
         )
-        NavigationBarItem(
-            icon = { ProfileIcon() },
-            label = { Text("Profile") },
-            selected = currentRoute == "profile",
-            onClick = {
-                navController.navigate("profile")
-            }
-        )
+//        NavigationBarItem(
+//            icon = { Icon(Icons.Filled.CalendarMonth, contentDescription = "Calendar") },
+//            label = { Text("Calendar") },
+//            selected = currentRoute == "calendar",
+//            onClick = {
+//                navController.navigate("calendar")
+//            }
+//        )
+//        NavigationBarItem(
+//            icon = { ProfileIcon() },
+//            label = { Text("Profile") },
+//            selected = currentRoute == "profile",
+//            onClick = {
+//                navController.navigate("profile")
+//            }
+//        )
     }
 }
 
