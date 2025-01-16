@@ -79,7 +79,8 @@ class WatchListViewModel @Inject constructor(private val graphQLRepository: Grap
             entries.sortedBy {
                 -max(
                     0,
-                    ((it?.media?.nextAiringEpisode?.episode ?: 1) - (it?.progress ?: 0) - 1)
+                    ((it?.media?.nextAiringEpisode?.episode ?: it?.media?.episodes
+                    ?: 1) - (it?.progress ?: 0) - 1)
                 )
             }
     }

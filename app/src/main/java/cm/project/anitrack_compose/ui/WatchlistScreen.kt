@@ -103,7 +103,8 @@ fun WatchListScreen(
                         navController = navController,
                         unwatchedEpisodes = max(
                             0,
-                            ((entry.media?.nextAiringEpisode?.episode ?: 1) - (entry.progress
+                            ((entry.media?.nextAiringEpisode?.episode ?: entry.media?.episodes
+                            ?: 1) - (entry.progress
                                 ?: 0) - 1)
                         ),
                         title = entry.media?.title?.english ?: entry.media?.title?.native ?: "",
