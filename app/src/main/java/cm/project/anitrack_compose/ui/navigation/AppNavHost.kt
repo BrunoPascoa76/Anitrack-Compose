@@ -25,7 +25,6 @@ fun AppNavHost(
         composable("watchlist") {
             WatchlistScreen(navController = navController)
         }
-        composable("auth") {}
         composable("apiSetup") {
             APISetupScreen(
                 preferencesViewModel = preferencesViewModel,

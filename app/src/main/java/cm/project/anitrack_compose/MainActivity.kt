@@ -54,5 +54,4 @@ class MainActivity : ComponentActivity() {
             oAuthViewModel.handleAuthResponse(uri)
         }
     }
-
 }

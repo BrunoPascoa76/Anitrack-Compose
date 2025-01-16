@@ -1,11 +1,13 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("com.apollographql.apollo3") version "4.0.0-beta.4"
 }
 
 android {
     namespace = "cm.project.anitrack_compose"
     compileSdk = 35
+
 
     defaultConfig {
         applicationId = "cm.project.anitrack_compose"
@@ -50,6 +52,7 @@ android {
     }
 }
 
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -70,5 +73,20 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.appauth)
+    implementation(libs.coil.compose)
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.apollo.runtime)
+    implementation(libs.apollo.api)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.apollo.normalized.cache)
+    implementation(libs.apollo.http.cache)
+}
 
+apollo {
+    service("anilist") {
+        packageName.set("cm.project.anitrack_compose.graphql")
+        introspection {
+            endpointUrl.set("https://graphql.anilist.co")
+        }
+    }
 }
