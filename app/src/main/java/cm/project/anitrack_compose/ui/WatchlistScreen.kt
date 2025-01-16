@@ -1,8 +1,12 @@
 package cm.project.anitrack_compose.ui
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
@@ -10,15 +14,20 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import cm.project.anitrack_compose.graphql.type.MediaListStatus
+import cm.project.anitrack_compose.ui.components.AnimeGridCard
 import cm.project.anitrack_compose.ui.components.BottomNavBar
 import cm.project.anitrack_compose.viewModels.WatchListViewModel
+import kotlin.math.max
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,9 +62,9 @@ fun WatchlistScreen(
             val possibleStatuses =
                 listOf(MediaListStatus.CURRENT, MediaListStatus.PLANNING, MediaListStatus.COMPLETED)
             when (selectedIndex) {
-                0 -> WatchListScreen(possibleStatuses[0])
-                1 -> WatchListScreen(possibleStatuses[1])
-                2 -> WatchListScreen(possibleStatuses[2])
+                0 -> WatchListScreen(navController, possibleStatuses[0])
+                1 -> WatchListScreen(navController, possibleStatuses[1])
+                2 -> WatchListScreen(navController, possibleStatuses[2])
             }
         }
     }
@@ -63,8 +72,46 @@ fun WatchlistScreen(
 
 @Composable
 fun WatchListScreen(
+    navController: NavController,
     mediaListStatus: MediaListStatus,
     watchListViewModel: WatchListViewModel = hiltViewModel()
 ) {
+    val watchlist by watchListViewModel.watchlist.collectAsState()
 
+    LaunchedEffect(Unit) {
+        watchListViewModel.startRefreshing(mediaListStatus)
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            watchListViewModel.stopRefreshing()
+        }
+    }
+
+    if (watchlist.isNotEmpty()) {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            contentPadding = PaddingValues(5.dp),
+            modifier = Modifier.padding(5.dp),
+            verticalArrangement = Arrangement.spacedBy(5.dp),
+            horizontalArrangement = Arrangement.spacedBy(5.dp)
+        ) {
+            items(watchlist.size) { index ->
+                val entry = watchlist[index]
+                if (entry != null) {
+                    AnimeGridCard(
+                        navController = navController,
+                        unwatchedEpisodes = max(
+                            0,
+                            ((entry.media?.nextAiringEpisode?.episode ?: 1) - (entry.progress
+                                ?: 0) - 1)
+                        ),
+                        title = entry.media?.title?.english ?: "",
+                        id = entry.media?.id ?: 0,
+                        imageUrl = entry.media?.coverImage?.large
+                    )
+                }
+            }
+        }
+    }
 }

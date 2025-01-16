@@ -3,6 +3,7 @@ query GetMediaList($userId: Int, $status: MediaListStatus, $type: MediaType, $so
         lists {
             entries {
                 media {
+                    id
                     episodes
                     title {
                         english
@@ -11,7 +12,11 @@ query GetMediaList($userId: Int, $status: MediaListStatus, $type: MediaType, $so
                     coverImage {
                         large
                     }
+                    nextAiringEpisode {
+                        episode
+                    }
                 }
+                progress
             }
         }
     }

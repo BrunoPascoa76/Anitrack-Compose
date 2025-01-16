@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.max
 
 @HiltViewModel
 class WatchListViewModel @Inject constructor(private val graphQLRepository: GraphQLRepository) :
@@ -29,11 +30,14 @@ class WatchListViewModel @Inject constructor(private val graphQLRepository: Grap
     val selectedStatus = _selectedIndex.asStateFlow()
 
     fun startRefreshing(status: MediaListStatus) {
-        viewModelScope.launch {
-            _isRefreshing = true
-            refresh(status)
-            delay(5000)
+        _isRefreshing = true
+        refreshJob = viewModelScope.launch {
+            while (_isRefreshing) {
+                refresh(status)
+                delay(5000)
+            }
         }
+
     }
 
     fun setSelectedIndex(index: Int) {
@@ -59,11 +63,25 @@ class WatchListViewModel @Inject constructor(private val graphQLRepository: Grap
         }
         when (val result = graphQLRepository.getMediaList(_userId!!, status)) {
             is Result.Success -> {
-                _watchlist.value = result.data.lists?.get(0)?.entries ?: emptyList()
+                if (status == MediaListStatus.CURRENT) {
+                    orderByUnwatched(result.data.lists?.get(0)?.entries ?: emptyList())
+                } else {
+                    _watchlist.value = result.data.lists?.get(0)?.entries ?: emptyList()
+                }
             }
 
             is Result.Error -> {}
         }
+    }
+
+    private fun orderByUnwatched(entries: List<Entry?>) {
+        _watchlist.value =
+            entries.sortedBy {
+                -max(
+                    0,
+                    ((it?.media?.nextAiringEpisode?.episode ?: 1) - (it?.progress ?: 0) - 1)
+                )
+            }
     }
 
 }
