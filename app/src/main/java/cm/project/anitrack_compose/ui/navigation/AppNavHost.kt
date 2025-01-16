@@ -24,10 +24,9 @@ fun AppNavHost(
         modifier = modifier
     ) {
         composable("watchlist") {
-            GraphQLWrapper(preferencesViewModel) { graphQLRepository ->
+            GraphQLWrapper(preferencesViewModel) {
                 WatchlistScreen(
-                    navController = navController,
-                    graphQLRepository = graphQLRepository
+                    navController = navController
                 )
             }
         }

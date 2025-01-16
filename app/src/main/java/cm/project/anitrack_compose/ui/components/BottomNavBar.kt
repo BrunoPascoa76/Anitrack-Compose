@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
@@ -12,15 +13,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import cm.project.anitrack_compose.repositories.GraphQLRepository
 import cm.project.anitrack_compose.viewModels.ProfilePictureViewModel
 import coil.compose.rememberAsyncImagePainter
 
 @Composable
-fun BottomNavBar(navController: NavController, graphQLRepository: GraphQLRepository) {
+fun BottomNavBar(navController: NavController) {
     val currentRoute = navController.currentBackStackEntry?.destination?.route
 
     NavigationBar {
@@ -33,7 +35,7 @@ fun BottomNavBar(navController: NavController, graphQLRepository: GraphQLReposit
             }
         )
         NavigationBarItem(
-            icon = { ProfileIcon(graphQLRepository) },
+            icon = { ProfileIcon() },
             label = { Text("Profile") },
             selected = currentRoute == "profile",
             onClick = {
@@ -44,17 +46,17 @@ fun BottomNavBar(navController: NavController, graphQLRepository: GraphQLReposit
 }
 
 @Composable
-fun ProfileIcon(graphQLRepository: GraphQLRepository) {
-    val profilePictureViewModel = ProfilePictureViewModel(graphQLRepository)
+fun ProfileIcon() {
+    val profilePictureViewModel = hiltViewModel<ProfilePictureViewModel>()
     val profilePictureUrl by profilePictureViewModel.profilePictureUrl.collectAsState()
 
     Icon(
         painter = rememberAsyncImagePainter(
             model = profilePictureUrl,
-            error = rememberVectorPainter(Icons.Filled.Person),
-            placeholder = rememberVectorPainter(Icons.Filled.Person)
+            placeholder = rememberVectorPainter(Icons.Filled.Person),
         ),
         contentDescription = "Profile picture",
-        modifier = Modifier.size(48.dp)
+        modifier = Modifier.size(30.dp),
+        tint = if (profilePictureUrl.isEmpty()) MaterialTheme.colorScheme.onSurface else Color.Unspecified
     )
 }

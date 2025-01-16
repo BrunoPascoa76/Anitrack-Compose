@@ -83,6 +83,7 @@ dependencies {
     implementation(libs.apollo.normalized.cache)
     implementation(libs.apollo.http.cache)
     implementation(libs.hilt.android.v250)
+    implementation(libs.androidx.hilt.navigation.compose)
     kapt(libs.hilt.compiler.v250)
 }
 

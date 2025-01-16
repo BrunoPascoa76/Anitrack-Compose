@@ -6,10 +6,14 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cm.project.anitrack_compose.repositories.PreferencesRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class OAuthViewModel(
-    private val context: Context,
+@HiltViewModel
+class OAuthViewModel @Inject constructor(
+    @ApplicationContext val context: Context,
     private val preferencesRepository: PreferencesRepository
 ) : ViewModel() {
     val accessToken = preferencesRepository.accessToken
