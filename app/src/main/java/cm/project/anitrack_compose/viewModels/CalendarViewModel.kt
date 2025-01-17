@@ -14,6 +14,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
@@ -36,17 +37,21 @@ class CalendarViewModel @Inject constructor(
     val selectedIndex = _selectedIndex.asStateFlow()
 
     private val _calendar =
-        MutableStateFlow<List<GetAiringAnimeCalendarQuery.AiringSchedule?>?>(emptyList())
+        MutableStateFlow<List<GetAiringAnimeCalendarQuery.AiringSchedule?>>(emptyList())
     val calendar = _calendar.asStateFlow()
 
     fun setSelectedIndex(index: Int) {
         _selectedIndex.value = index
+        viewModelScope.launch {
+            refresh()
+        }
     }
 
 
     fun setCalendarFilterWatchlist(value: Boolean) {
         viewModelScope.launch {
             preferencesRepository.saveCalendarFilterWatchlist(value)
+            refresh()
         }
     }
 
@@ -62,15 +67,17 @@ class CalendarViewModel @Inject constructor(
                 }
             }
         }
-        when (val result = graphQLRepository.getMediaLists(
-            _userId!!,
-            listOf(MediaListStatus.CURRENT, MediaListStatus.PLANNING)
-        )) {
-            is Result.Success -> {
-                processAiringWatchlist(result.data)
-            }
+        if (calendarFilterWatchlist.first()) {
+            when (val result = graphQLRepository.getMediaLists(
+                _userId!!,
+                listOf(MediaListStatus.CURRENT, MediaListStatus.PLANNING)
+            )) {
+                is Result.Success -> {
+                    processAiringWatchlist(result.data)
+                }
 
-            is Result.Error -> {}
+                is Result.Error -> {}
+            }
         }
         when (val result = graphQLRepository.getAiringAnimeCalendar(
             airingAtGreater = LocalDate.now().plusDays(_selectedIndex.value.toLong())
@@ -78,10 +85,10 @@ class CalendarViewModel @Inject constructor(
             airingAtLesser = LocalDate.now().plusDays(_selectedIndex.value.toLong())
                 .atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toEpochSecond().toInt(),
             sort = listOf(AiringSort.TIME),
-            mediaIdIn = _airingWatchlist
+            mediaIdIn = if (calendarFilterWatchlist.first() && _airingWatchlist.isNotEmpty()) _airingWatchlist else null
         )) {
             is Result.Success -> {
-                _calendar.value = result.data.airingSchedules
+                _calendar.value = result.data.airingSchedules ?: emptyList()
             }
 
             is Result.Error -> {}

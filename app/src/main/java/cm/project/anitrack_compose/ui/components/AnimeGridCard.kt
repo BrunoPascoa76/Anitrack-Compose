@@ -30,11 +30,11 @@ import coil.request.ImageRequest
 @Composable
 fun AnimeGridCard(
     navController: NavController,
-    unwatchedEpisodes: Int,
     title: String,
     imageUrl: String?,
     modifier: Modifier = Modifier,
-    id: Int = 0,
+    id: Int,
+    unwatchedEpisodes: Int = 0,
 ) {
     ElevatedCard(modifier = modifier
         .fillMaxWidth()
