@@ -3,7 +3,6 @@ package cm.project.anitrack_compose.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -32,13 +32,12 @@ fun AnimeGridCard(
     navController: NavController,
     unwatchedEpisodes: Int,
     title: String,
-    id: Int,
     imageUrl: String?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    id: Int = 0,
 ) {
     ElevatedCard(modifier = modifier
         .fillMaxWidth()
-        .aspectRatio(9.2f / 13f)
         .clickable { navController.navigate("anime/$id/details") }) {
         BadgedBox(
             badge = {
@@ -49,7 +48,7 @@ fun AnimeGridCard(
                         .height(30.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.Red)
                 ) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                         Text(
                             unwatchedEpisodes.toString(),
                             fontWeight = FontWeight.Bold,
@@ -74,7 +73,8 @@ private fun ImageComponent(imageUrl: String?) {
     AsyncImage(
         model = ImageRequest.Builder(LocalContext.current).data(imageUrl).build(),
         contentDescription = null,
-        modifier = Modifier.fillMaxSize()
+        contentScale = ContentScale.FillWidth,
+        modifier = Modifier.fillMaxWidth()
     )
 }
 

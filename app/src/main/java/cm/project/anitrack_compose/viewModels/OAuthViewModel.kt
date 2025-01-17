@@ -22,8 +22,10 @@ class OAuthViewModel @Inject constructor(
         val url =
             "https://anilist.co/api/v2/oauth/authorize?client_id=$clientId&response_type=token"
 
-        val authIntent = Intent(Intent.ACTION_VIEW)
-        authIntent.data = Uri.parse(url)
+        val authIntent = Intent(Intent.ACTION_VIEW).apply {
+            data = Uri.parse(url)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
 
         // Start the activity
         context.startActivity(authIntent)
