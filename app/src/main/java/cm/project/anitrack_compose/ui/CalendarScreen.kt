@@ -80,7 +80,7 @@ fun CalendarScreen(navController: NavController) {
                             },
                             selected = selectedIndex == i,
                             onClick = {
-                                calendarViewModel.setSelectedIndex(i)
+                                if (selectedIndex != i) calendarViewModel.setSelectedIndex(i)
                             }
                         )
                     }

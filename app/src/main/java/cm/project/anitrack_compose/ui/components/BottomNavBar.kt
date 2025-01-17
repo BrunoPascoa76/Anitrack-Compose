@@ -32,7 +32,7 @@ fun BottomNavBar(navController: NavController) {
             label = { Text("Watchlist") },
             selected = currentRoute == "watchlist",
             onClick = {
-                navController.navigate("watchlist")
+                if (currentRoute != "watchlist") navController.navigate("watchlist")
             }
         )
         NavigationBarItem(
@@ -40,7 +40,7 @@ fun BottomNavBar(navController: NavController) {
             label = { Text("Calendar") },
             selected = currentRoute == "calendar",
             onClick = {
-                navController.navigate("calendar")
+                if (currentRoute != "calendar") navController.navigate("calendar")
             }
         )
 //        NavigationBarItem(
@@ -48,7 +48,7 @@ fun BottomNavBar(navController: NavController) {
 //            label = { Text("Profile") },
 //            selected = currentRoute == "profile",
 //            onClick = {
-//                navController.navigate("profile")
+//                if (currentRoute != "profile") navController.navigate("profile")
 //            }
 //        )
     }

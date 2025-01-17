@@ -52,7 +52,9 @@ fun WatchlistScreen(
                             text = { Text(title) },
                             selected = selectedIndex == index,
                             onClick = {
-                                watchListViewModel.setSelectedIndex(index)
+                                if (selectedIndex != index) watchListViewModel.setSelectedIndex(
+                                    index
+                                )
                             }
                         )
                     }

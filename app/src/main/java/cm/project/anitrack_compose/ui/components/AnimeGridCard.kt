@@ -102,7 +102,7 @@ fun AnimeGridCard(
                 if (imageUrl != null) {
                     ImageComponent(imageUrl)
                 }
-                TitleComponent(title, airingAt)
+                TitleComponent(title)
             }
         }
     }
@@ -119,15 +119,13 @@ private fun ImageComponent(imageUrl: String?) {
 }
 
 @Composable
-private fun TitleComponent(title: String, airingAt: Int? = null) {
+private fun TitleComponent(title: String) {
     val gradient = Brush.verticalGradient(
         colors = listOf(
             Color.Transparent,
             Color.Black
         ),
     )
-
-
 
     Box(
         modifier = Modifier

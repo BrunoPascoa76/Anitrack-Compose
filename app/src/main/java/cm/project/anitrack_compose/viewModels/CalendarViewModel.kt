@@ -42,6 +42,7 @@ class CalendarViewModel @Inject constructor(
 
     fun setSelectedIndex(index: Int) {
         _selectedIndex.value = index
+        _airingWatchlist = emptyList()
         viewModelScope.launch {
             refresh()
         }
