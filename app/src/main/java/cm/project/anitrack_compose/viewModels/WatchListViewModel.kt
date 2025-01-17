@@ -41,6 +41,7 @@ class WatchListViewModel @Inject constructor(private val graphQLRepository: Grap
     }
 
     fun setSelectedIndex(index: Int) {
+        _watchlist.value = emptyList()
         _selectedIndex.value = index
     }
 

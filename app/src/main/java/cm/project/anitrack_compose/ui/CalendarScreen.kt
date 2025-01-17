@@ -133,7 +133,8 @@ private fun Calendar(
                         navController = navController,
                         title = entry.media?.title?.english ?: entry.media?.title?.native ?: "",
                         id = entry.media?.id ?: 0,
-                        imageUrl = entry.media?.coverImage?.large
+                        imageUrl = entry.media?.coverImage?.large,
+                        airingAt = entry.airingAt
                     )
                 }
             }

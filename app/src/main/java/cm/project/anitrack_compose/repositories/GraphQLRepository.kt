@@ -44,7 +44,7 @@ class GraphQLRepository @Inject constructor(private val apolloClient: ApolloClie
         userId: Int,
         status: MediaListStatus,
         type: MediaType = MediaType.ANIME,
-        sort: List<MediaListSort> = listOf(MediaListSort.SCORE_DESC)
+        sort: List<MediaListSort> = listOf(MediaListSort.ADDED_TIME_DESC)
     ): Result<GetMediaListQuery.MediaListCollection> {
         return try {
             val response = apolloClient.query(

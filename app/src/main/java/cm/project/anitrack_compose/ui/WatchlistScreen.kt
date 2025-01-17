@@ -104,12 +104,13 @@ fun WatchListScreen(
                 if (entry != null) {
                     AnimeGridCard(
                         navController = navController,
-                        unwatchedEpisodes = max(
-                            0,
-                            ((entry.media?.nextAiringEpisode?.episode ?: entry.media?.episodes
-                            ?: 1) - (entry.progress
-                                ?: 0) - 1)
-                        ),
+                        unwatchedEpisodes = if (mediaListStatus == MediaListStatus.CURRENT)
+                            max(
+                                0,
+                                ((entry.media?.nextAiringEpisode?.episode ?: entry.media?.episodes
+                                ?: 1) - (entry.progress
+                                    ?: 0) - 1)
+                            ) else 0,
                         title = entry.media?.title?.english ?: entry.media?.title?.native ?: "",
                         id = entry.media?.id ?: 0,
                         imageUrl = entry.media?.coverImage?.large
