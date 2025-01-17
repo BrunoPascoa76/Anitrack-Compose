@@ -1,0 +1,11 @@
+query GetMediaLists($userId: Int, $type: MediaType, $sort: [MediaListSort], $statusIn: [MediaListStatus]) {
+    MediaListCollection(userId: $userId, type: $type, sort: $sort, status_in: $statusIn) {
+        lists {
+            entries {
+                media {
+                    id
+                }
+            }
+        }
+    }
+}

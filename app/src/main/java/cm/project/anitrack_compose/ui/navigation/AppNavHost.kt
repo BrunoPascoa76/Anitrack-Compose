@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import cm.project.anitrack_compose.ui.APISetupScreen
+import cm.project.anitrack_compose.ui.CalendarScreen
 import cm.project.anitrack_compose.ui.WatchlistScreen
 import cm.project.anitrack_compose.ui.components.GraphQLWrapper
 import cm.project.anitrack_compose.viewModels.PreferencesViewModel
@@ -32,6 +33,11 @@ fun AppNavHost(
         }
         composable("profile") {
 
+        }
+        composable("calendar") {
+            GraphQLWrapper(preferencesViewModel) {
+                CalendarScreen(navController = navController)
+            }
         }
         composable("apiSetup") {
             APISetupScreen(

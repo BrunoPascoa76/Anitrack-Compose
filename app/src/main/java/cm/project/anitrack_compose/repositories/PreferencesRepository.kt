@@ -3,6 +3,7 @@ package cm.project.anitrack_compose.repositories
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -15,10 +16,11 @@ import javax.inject.Inject
 class PreferencesRepository @Inject constructor(@ApplicationContext private val context: Context) {
     companion object {
         private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
-        val CLIENT_ID = stringPreferencesKey("client_id")
-        val CLIENT_SECRET = stringPreferencesKey("client_secret")
-        val ACCESS_TOKEN = stringPreferencesKey("access_token")
-        val ACCESS_TOKEN_EXPIRATION = longPreferencesKey("access_token_expiration")
+        private val CLIENT_ID = stringPreferencesKey("client_id")
+        private val CLIENT_SECRET = stringPreferencesKey("client_secret")
+        private val ACCESS_TOKEN = stringPreferencesKey("access_token")
+        private val ACCESS_TOKEN_EXPIRATION = longPreferencesKey("access_token_expiration")
+        private val CALENDAR_FILTER_WATCHLIST = booleanPreferencesKey("calendar_filter_watchlist")
     }
 
     val clientId: Flow<String?> = context.dataStore.data.map { preferences ->
@@ -35,6 +37,10 @@ class PreferencesRepository @Inject constructor(@ApplicationContext private val 
 
     val accessTokenExpiration: Flow<Long?> = context.dataStore.data.map { preferences ->
         preferences[ACCESS_TOKEN_EXPIRATION]
+    }
+
+    val calendarFilterWatchlist: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[CALENDAR_FILTER_WATCHLIST] ?: false
     }
 
     suspend fun saveClientId(clientId: String) {
@@ -59,6 +65,12 @@ class PreferencesRepository @Inject constructor(@ApplicationContext private val 
         context.dataStore.edit { preferences ->
             preferences[ACCESS_TOKEN_EXPIRATION] =
                 System.currentTimeMillis() + expiresIn
+        }
+    }
+
+    suspend fun saveCalendarFilterWatchlist(filter: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[CALENDAR_FILTER_WATCHLIST] = filter
         }
     }
 

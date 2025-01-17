@@ -34,7 +34,7 @@ class WatchListViewModel @Inject constructor(private val graphQLRepository: Grap
         refreshJob = viewModelScope.launch {
             while (_isRefreshing) {
                 refresh(status)
-                delay(5000)
+                delay(60_000)
             }
         }
 

@@ -1,0 +1,18 @@
+query GetAiringAnimeCalendar($airingAtGreater: Int, $airingAtLesser: Int, $sort: [AiringSort], $mediaIdIn: [Int]) {
+    Page {
+        airingSchedules(airingAt_greater: $airingAtGreater, airingAt_lesser: $airingAtLesser, sort: $sort, mediaId_in: $mediaIdIn) {
+            airingAt
+            episode
+            media {
+                title {
+                    english
+                    native
+                }
+                id
+                coverImage {
+                    large
+                }
+            }
+        }
+    }
+}
