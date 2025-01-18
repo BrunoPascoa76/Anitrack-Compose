@@ -11,14 +11,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.outlined.PlayCircle
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
@@ -237,7 +241,7 @@ private fun ExtendedInfoComponent(media: GetMediaDetailsQuery.Media) {
                 )
             }
             Spacer(modifier = Modifier.height(5.dp))
-            
+
             media.description?.let { description ->
                 Text("Description:")
                 if (isExpanded) Text(AnnotatedString.fromHtml(description)) else Text(
@@ -256,6 +260,32 @@ private fun ExtendedInfoComponent(media: GetMediaDetailsQuery.Media) {
     }
     url?.let {
         TrailerComponent(thumbnail = media.trailer?.thumbnail, url = url)
+    }
+    Spacer(modifier = Modifier.height(5.dp))
+
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
+        modifier = Modifier.padding(horizontal = 10.dp)
+    ) {
+        items(media.genres?.size ?: 0) { index ->
+            media.genres!![index]?.let { genre ->
+                ElevatedCard(
+                    modifier = Modifier
+                        .padding(4.dp) // Padding around the card
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .defaultMinSize(minWidth = 100.dp, minHeight = 50.dp)
+                            .padding(horizontal = 10.dp)
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.Label, contentDescription = null)
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(genre)
+                    }
+                }
+            }
+        }
     }
 }
 
