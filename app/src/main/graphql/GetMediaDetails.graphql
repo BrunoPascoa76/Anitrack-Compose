@@ -94,12 +94,13 @@ query GetMediaDetails($mediaId: Int) {
         staff {
             edges {
                 node {
-                    staff {
-                        id
-                        name {
-                            first
-                            last
-                        }
+                    id
+                    name {
+                        first
+                        last
+                    }
+                    image{
+                        medium
                     }
                 }
                 role

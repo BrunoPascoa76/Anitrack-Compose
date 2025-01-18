@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import cm.project.anitrack_compose.ui.components.AnimeGridCard
@@ -145,7 +146,7 @@ private fun Calendar(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text("(╥﹏╥)", style = MaterialTheme.typography.headlineLarge)
+            Text("(╥﹏╥)", style = MaterialTheme.typography.headlineLarge.copy(fontSize = 50.sp))
             Text("No anime today", style = MaterialTheme.typography.bodyLarge)
         }
     }

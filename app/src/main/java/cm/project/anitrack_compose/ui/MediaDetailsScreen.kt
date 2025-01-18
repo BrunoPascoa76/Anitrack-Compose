@@ -22,8 +22,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.rememberScrollState
@@ -119,7 +117,7 @@ fun MediaDetailsScreen(mediaId: Int, navController: NavController) {
                     0 -> ExtendedInfoComponent(media!!)
                     1 -> RelationsComponent(media!!.relations!!, navController)
                     2 -> CharactersComponent(media!!.characters!!)
-                    3 -> StaffComponent()
+                    3 -> StaffComponent(media!!.staff!!)
                     4 -> RecommendationsComponent(media!!.recommendations!!, navController)
                     5 -> ReviewsComponent(media!!.reviews!!)
                 }
@@ -469,6 +467,7 @@ private fun RelationsComponent(
                     }
                 }
             }
+            Spacer(modifier = Modifier.height(20.dp))
         }
     }
 }
@@ -489,27 +488,30 @@ private fun CharactersComponent(characters: GetMediaDetailsQuery.Characters) {
         }
 
 
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column(
+        modifier = Modifier
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState())
+    ) {
         sortedGroupedCharacters.forEach { (role, characters) ->
             Text(role.toString().lowercase().replaceFirstChar { it.uppercase() }
                 .replace("_", " "), style = MaterialTheme.typography.titleMedium)
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(4),
+            LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 items(characters.size) { index ->
                     val character = characters[index]
                     character.let { node ->
                         ElevatedCard(modifier = Modifier.fillMaxSize()) {
-                            Column {
+                            Column(modifier = Modifier.fillMaxWidth()) {
                                 AsyncImage(
                                     model = ImageRequest.Builder(LocalContext.current)
                                         .data(node?.node?.image?.medium).build(),
-                                    contentScale = ContentScale.FillWidth,
+                                    contentScale = ContentScale.FillHeight,
                                     contentDescription = null,
                                     modifier = Modifier
-                                        .fillMaxWidth()
+                                        .width(150.dp)
+                                        .height(240.dp)
                                 )
                                 Text(
                                     (node?.node?.name?.first ?: "") + " " + (node?.node?.name?.last
@@ -521,13 +523,54 @@ private fun CharactersComponent(characters: GetMediaDetailsQuery.Characters) {
                     }
                 }
             }
+            Spacer(modifier = Modifier.height(20.dp))
         }
     }
 }
 
 @Composable
-private fun StaffComponent() {
+private fun StaffComponent(staff: GetMediaDetailsQuery.Staff) {
+    val edges = staff.edges ?: emptyList()
 
+    val groupedStaff = edges.groupBy { edge -> edge?.role }
+
+    Column(
+        modifier = Modifier
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState())
+    ) {
+        groupedStaff.forEach { (role, staffMembers) ->
+            Text(role ?: "Other", style = MaterialTheme.typography.titleMedium)
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                items(staffMembers.size) { index ->
+                    val character = staffMembers[index]
+                    character.let { node ->
+                        ElevatedCard(modifier = Modifier.fillMaxSize()) {
+                            Column(modifier = Modifier.fillMaxWidth()) {
+                                AsyncImage(
+                                    model = ImageRequest.Builder(LocalContext.current)
+                                        .data(node?.node?.image?.medium).build(),
+                                    contentScale = ContentScale.FillHeight,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .width(150.dp)
+                                        .height(240.dp)
+                                )
+                                Text(
+                                    (node?.node?.name?.first ?: "") + " " + (node?.node?.name?.last
+                                        ?: ""),
+                                    modifier = Modifier.padding(vertical = 5.dp, horizontal = 10.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(20.dp))
+        }
+    }
 }
 
 
@@ -591,13 +634,15 @@ private fun ReviewsComponent(reviews: GetMediaDetailsQuery.Reviews) {
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
                                     Text(it.user?.name ?: "")
-                                    RatingBar(
-                                        value = it.score?.toFloat() ?: 0f,
-                                        style = RatingBarStyle.Default,
-                                        onValueChange = {},
-                                        onRatingChanged = {},
-                                        size = 15.dp,
-                                    )
+                                    it.score?.let { score ->
+                                        RatingBar(
+                                            value = score.toFloat() / 20,
+                                            style = RatingBarStyle.Default,
+                                            onValueChange = {},
+                                            onRatingChanged = {},
+                                            size = 15.dp,
+                                        )
+                                    }
                                 }
                                 Spacer(modifier = Modifier.height(5.dp))
                                 Text(it.summary ?: "")
