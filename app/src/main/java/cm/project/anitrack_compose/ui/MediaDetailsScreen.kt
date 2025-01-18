@@ -365,6 +365,33 @@ private fun ExtendedInfoComponent(media: GetMediaDetailsQuery.Media) {
                 }
             }
         }
+        Text(
+            "Studios:",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(horizontal = 10.dp)
+        )
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
+            modifier = Modifier.padding(horizontal = 10.dp)
+        ) {
+            items(media.studios?.nodes?.size ?: 0) { index ->
+                media.studios!!.nodes!![index]?.let { studio ->
+                    ElevatedCard(
+                        modifier = Modifier
+                            .padding(4.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .defaultMinSize(minWidth = 100.dp, minHeight = 50.dp)
+                                .padding(horizontal = 10.dp)
+                        ) {
+                            Text(studio.name)
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -500,6 +527,7 @@ private fun CharactersComponent(characters: GetMediaDetailsQuery.Characters) {
 
 @Composable
 private fun StaffComponent() {
+
 }
 
 

@@ -92,15 +92,17 @@ query GetMediaDetails($mediaId: Int) {
             year
         }
         staff {
-            nodes {
-                id
-                name {
-                    first
-                    last
+            edges {
+                node {
+                    staff {
+                        id
+                        name {
+                            first
+                            last
+                        }
+                    }
                 }
-                image {
-                    medium
-                }
+                role
             }
         }
         format
