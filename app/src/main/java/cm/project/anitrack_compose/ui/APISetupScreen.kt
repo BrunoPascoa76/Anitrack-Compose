@@ -28,9 +28,11 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import cm.project.anitrack_compose.repositories.PreferencesRepository
+import cm.project.anitrack_compose.viewModels.OAuthViewModel
 import cm.project.anitrack_compose.viewModels.PreferencesViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,9 +47,11 @@ fun APISetupScreen(
 ) {
     val clientId by preferencesViewModel.clientId.collectAsState(initial = null)
     val clientSecret by preferencesViewModel.clientSecret.collectAsState(initial = null)
+    val oauthViewModel = hiltViewModel<OAuthViewModel>()
 
     LaunchedEffect(clientId, clientSecret) {
         if (clientId != null && clientSecret != null) {
+            oauthViewModel.startAuth(clientId!!)
             navController.navigate("watchlist")
         }
     }
@@ -92,7 +96,8 @@ private fun Instructions() {
         })
         Text("2. Create a new client (or use a pre-existing one)")
         Text("3. Copy the Client ID and Client Secret")
-        Text("4. Press submit")
+        Text("4. Set redirect URL to myapp://auth")
+        Text("5. Press submit")
     }
 }
 
