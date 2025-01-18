@@ -56,7 +56,6 @@ android {
 
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -86,6 +85,7 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     kapt(libs.hilt.compiler.v250)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.compose.ratingbar)
 }
 
 apollo {

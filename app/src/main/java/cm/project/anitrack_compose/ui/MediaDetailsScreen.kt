@@ -36,11 +36,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import cm.project.anitrack_compose.fuzzyDateToString
 import cm.project.anitrack_compose.graphql.GetMediaDetailsQuery
 import cm.project.anitrack_compose.ui.components.LoadingScreen
 import cm.project.anitrack_compose.viewModels.MediaDetailsViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.gowtham.ratingbar.RatingBar
+import com.gowtham.ratingbar.RatingBarStyle
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -186,8 +189,36 @@ private fun BasicInfoComponent(media: GetMediaDetailsQuery.Media) {
 
 @Composable
 private fun ExtendedInfoComponent(media: GetMediaDetailsQuery.Media) {
-    ElevatedCard(modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)) {
-
+    ElevatedCard(modifier = Modifier.padding(10.dp)) {
+        Column(modifier = Modifier.padding(vertical = 5.dp, horizontal = 10.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "Start: " + fuzzyDateToString(
+                        media.startDate?.day,
+                        media.startDate?.month,
+                        media.startDate?.year
+                    )
+                )
+                if (media.averageScore != null) RatingBar(
+                    value = media.averageScore.toFloat() / 20,
+                    style = RatingBarStyle.Default,
+                    onValueChange = {},
+                    onRatingChanged = {},
+                    size = 15.dp
+                )
+                Text(
+                    "End: " + fuzzyDateToString(
+                        media.endDate?.day,
+                        media.endDate?.month,
+                        media.endDate?.year
+                    )
+                )
+            }
+        }
     }
 }
 
