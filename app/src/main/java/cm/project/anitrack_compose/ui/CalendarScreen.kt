@@ -61,7 +61,7 @@ fun CalendarScreen(navController: NavController) {
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("Watchlist")
+                            Text("Calendar")
                             PillButton(calendarViewModel, calendarFilterWatchlist)
                         }
                     }
