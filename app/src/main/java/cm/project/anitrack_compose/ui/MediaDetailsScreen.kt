@@ -24,10 +24,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Label
+import androidx.compose.material.icons.filled.Sell
 import androidx.compose.material.icons.outlined.PlayCircle
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
@@ -207,80 +210,154 @@ private fun BasicInfoComponent(media: GetMediaDetailsQuery.Media) {
 @Composable
 private fun ExtendedInfoComponent(media: GetMediaDetailsQuery.Media) {
     var isExpanded by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
-    ElevatedCard(modifier = Modifier
-        .padding(10.dp)
-        .clickable { isExpanded = !isExpanded }) {
-        Column(modifier = Modifier.padding(vertical = 5.dp, horizontal = 10.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    "Start: " + fuzzyDateToString(
-                        media.startDate?.day,
-                        media.startDate?.month,
-                        media.startDate?.year
+    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+        ElevatedCard(modifier = Modifier
+            .padding(10.dp)
+            .clickable { isExpanded = !isExpanded }) {
+            Column(modifier = Modifier.padding(vertical = 5.dp, horizontal = 10.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "Start: " + fuzzyDateToString(
+                            media.startDate?.day,
+                            media.startDate?.month,
+                            media.startDate?.year
+                        )
                     )
-                )
-                if (media.averageScore != null) RatingBar(
-                    value = media.averageScore.toFloat() / 20,
-                    style = RatingBarStyle.Default,
-                    onValueChange = {},
-                    onRatingChanged = {},
-                    size = 15.dp
-                )
-                Text(
-                    "End: " + fuzzyDateToString(
-                        media.endDate?.day,
-                        media.endDate?.month,
-                        media.endDate?.year
+                    if (media.averageScore != null) RatingBar(
+                        value = media.averageScore.toFloat() / 20,
+                        style = RatingBarStyle.Default,
+                        onValueChange = {},
+                        onRatingChanged = {},
+                        size = 15.dp
                     )
-                )
-            }
-            Spacer(modifier = Modifier.height(5.dp))
+                    Text(
+                        "End: " + fuzzyDateToString(
+                            media.endDate?.day,
+                            media.endDate?.month,
+                            media.endDate?.year
+                        )
+                    )
+                }
+                Spacer(modifier = Modifier.height(5.dp))
 
-            media.description?.let { description ->
-                Text("Description:")
-                if (isExpanded) Text(AnnotatedString.fromHtml(description)) else Text(
-                    AnnotatedString.fromHtml(description),
-                    maxLines = 3,
-                    softWrap = true,
-                    overflow = TextOverflow.Ellipsis
-                )
+                media.description?.let { description ->
+                    Text("Description:")
+                    if (isExpanded) Text(AnnotatedString.fromHtml(description)) else Text(
+                        AnnotatedString.fromHtml(description),
+                        maxLines = 3,
+                        softWrap = true,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
         }
-    }
-    val url = when (media.trailer?.site) {
-        "youtube" -> "vnd.youtube:${media.trailer.id}"
-        "dailymotion" -> "https://www.dailymotion.com/video/${media.trailer.id}"
-        else -> null
-    }
-    url?.let {
-        TrailerComponent(thumbnail = media.trailer?.thumbnail, url = url)
-    }
-    Spacer(modifier = Modifier.height(5.dp))
+        val url = when (media.trailer?.site) {
+            "youtube" -> "vnd.youtube:${media.trailer.id}"
+            "dailymotion" -> "https://www.dailymotion.com/video/${media.trailer.id}"
+            else -> null
+        }
+        url?.let {
+            TrailerComponent(thumbnail = media.trailer?.thumbnail, url = url)
+        }
+        Spacer(modifier = Modifier.height(5.dp))
 
-    LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(5.dp),
-        modifier = Modifier.padding(horizontal = 10.dp)
-    ) {
-        items(media.genres?.size ?: 0) { index ->
-            media.genres!![index]?.let { genre ->
-                ElevatedCard(
-                    modifier = Modifier
-                        .padding(4.dp) // Padding around the card
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
+            modifier = Modifier.padding(horizontal = 10.dp)
+        ) {
+            items(media.genres?.size ?: 0) { index ->
+                media.genres!![index]?.let { genre ->
+                    ElevatedCard(
                         modifier = Modifier
-                            .defaultMinSize(minWidth = 100.dp, minHeight = 50.dp)
-                            .padding(horizontal = 10.dp)
+                            .padding(4.dp) // Padding around the card
                     ) {
-                        Icon(Icons.AutoMirrored.Filled.Label, contentDescription = null)
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Text(genre)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .defaultMinSize(minWidth = 100.dp, minHeight = 50.dp)
+                                .padding(horizontal = 10.dp)
+                        ) {
+                            Icon(Icons.AutoMirrored.Filled.Label, contentDescription = null)
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text(genre)
+                        }
+                    }
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+        Text(
+            "Tags:",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(horizontal = 10.dp)
+        )
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
+            modifier = Modifier.padding(horizontal = 10.dp)
+        ) {
+            items(media.tags?.size ?: 0) { index ->
+                media.tags!![index]?.let { tag ->
+                    ElevatedCard(
+                        modifier = Modifier
+                            .padding(4.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .defaultMinSize(minWidth = 100.dp, minHeight = 50.dp)
+                                .padding(horizontal = 10.dp)
+                        ) {
+                            Icon(Icons.Filled.Sell, contentDescription = null)
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text(tag.name)
+                        }
+                    }
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+        Text(
+            "External Links:",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(horizontal = 10.dp)
+        )
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
+            modifier = Modifier.padding(horizontal = 10.dp)
+        ) {
+            items(media.externalLinks?.size ?: 0) { index ->
+                media.externalLinks!![index]?.let { link ->
+                    ElevatedCard(
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .clickable {
+                                try {
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link.url))
+                                    context.startActivity(intent)
+                                } catch (_: Exception) {
+                                }
+                            }
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .defaultMinSize(minWidth = 100.dp, minHeight = 50.dp)
+                                .padding(horizontal = 10.dp)
+                        ) {
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current).data(link.icon)
+                                    .build(),
+                                contentDescription = null,
+                            )
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text(link.site)
+                        }
                     }
                 }
             }
