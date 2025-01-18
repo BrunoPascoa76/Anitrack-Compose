@@ -1,7 +1,11 @@
 package cm.project.anitrack_compose.ui
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,9 +14,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.outlined.PlayCircle
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -26,13 +33,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.fromHtml
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -189,7 +203,11 @@ private fun BasicInfoComponent(media: GetMediaDetailsQuery.Media) {
 
 @Composable
 private fun ExtendedInfoComponent(media: GetMediaDetailsQuery.Media) {
-    ElevatedCard(modifier = Modifier.padding(10.dp)) {
+    var isExpanded by remember { mutableStateOf(false) }
+
+    ElevatedCard(modifier = Modifier
+        .padding(10.dp)
+        .clickable { isExpanded = !isExpanded }) {
         Column(modifier = Modifier.padding(vertical = 5.dp, horizontal = 10.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -218,6 +236,69 @@ private fun ExtendedInfoComponent(media: GetMediaDetailsQuery.Media) {
                     )
                 )
             }
+            Spacer(modifier = Modifier.height(5.dp))
+            
+            media.description?.let { description ->
+                Text("Description:")
+                if (isExpanded) Text(AnnotatedString.fromHtml(description)) else Text(
+                    AnnotatedString.fromHtml(description),
+                    maxLines = 3,
+                    softWrap = true,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+    }
+    val url = when (media.trailer?.site) {
+        "youtube" -> "vnd.youtube:${media.trailer.id}"
+        "dailymotion" -> "https://www.dailymotion.com/video/${media.trailer.id}"
+        else -> null
+    }
+    url?.let {
+        TrailerComponent(thumbnail = media.trailer?.thumbnail, url = url)
+    }
+}
+
+@Composable
+private fun TrailerComponent(thumbnail: String?, url: String) {
+    val context = LocalContext.current
+
+    Box(modifier = Modifier.padding(horizontal = 10.dp)) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current).data(thumbnail).build(),
+            contentDescription = null,
+            contentScale = ContentScale.FillWidth,
+            modifier = Modifier
+                .fillMaxWidth()
+                .size(200.dp)
+        )
+        Box(
+            modifier = Modifier
+                .padding(10.dp)
+                .align(Alignment.Center)
+                .clip(CircleShape)
+                .size(90.dp)
+                .clickable {
+                    try {
+                        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                    } catch (e: ActivityNotFoundException) {
+                        context.startActivity(
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://youtube.com/watch?v=${url.split("=")[1]}")
+                            )
+                        )
+                    }
+                }
+                .background(Color.Black.copy(alpha = 0.3f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                Icons.Outlined.PlayCircle,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(70.dp)
+            )
         }
     }
 }
