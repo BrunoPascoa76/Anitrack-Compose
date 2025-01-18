@@ -6,12 +6,15 @@ import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,6 +22,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -45,6 +50,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
@@ -77,47 +83,39 @@ fun MediaDetailsScreen(mediaId: Int, navController: NavController) {
 
     if (media != null) {
         Scaffold { innerPadding ->
-            LazyColumn(
+            Column(
                 modifier = Modifier
                     .padding(innerPadding)
             ) {
-                item {
-                    BannerComponent(navController, media!!.bannerImage)
-                }
-                item {
-                    BasicInfoComponent(media!!)
-                }
-                stickyHeader {
-                    val tabs = listOf(
-                        "Details",
-                        "Relations",
-                        "Characters",
-                        "Staff",
-                        "Recommendations",
-                        "Reviews"
-                    )
-                    ScrollableTabRow(selectedTabIndex = selectedTab) {
-                        tabs.forEachIndexed { index, title ->
-                            Tab(
-                                selected = selectedTab == index,
-                                onClick = {
-                                    if (selectedTab != index) mediaDetailsViewModel.setSelectedTab(
-                                        index
-                                    )
-                                },
-                                text = { Text(title) })
-                        }
+                BannerComponent(navController, media!!.bannerImage)
+                BasicInfoComponent(media!!)
+                val tabs = listOf(
+                    "Details",
+                    "Relations",
+                    "Characters",
+                    "Staff",
+                    "Recommendations",
+                    "Reviews"
+                )
+                ScrollableTabRow(selectedTabIndex = selectedTab) {
+                    tabs.forEachIndexed { index, title ->
+                        Tab(
+                            selected = selectedTab == index,
+                            onClick = {
+                                if (selectedTab != index) mediaDetailsViewModel.setSelectedTab(
+                                    index
+                                )
+                            },
+                            text = { Text(title) })
                     }
                 }
-                item {
-                    when (selectedTab) {
-                        0 -> ExtendedInfoComponent(media!!)
-                        1 -> RelationsComponent(media!!.relations!!, navController)
-                        2 -> CharactersComponent()
-                        3 -> StaffComponent()
-                        4 -> RecommendationsComponent()
-                        5 -> ReviewsComponent()
-                    }
+                when (selectedTab) {
+                    0 -> ExtendedInfoComponent(media!!)
+                    1 -> RelationsComponent(media!!.relations!!, navController)
+                    2 -> CharactersComponent()
+                    3 -> StaffComponent()
+                    4 -> RecommendationsComponent(media!!.recommendations!!, navController)
+                    5 -> ReviewsComponent(media!!.reviews!!)
                 }
             }
         }
@@ -378,9 +376,88 @@ private fun StaffComponent() {
 
 
 @Composable
-private fun ReviewsComponent() {
+private fun RecommendationsComponent(
+    recommendations: GetMediaDetailsQuery.Recommendations,
+    navController: NavController
+) {
+    val nodes = recommendations.nodes ?: emptyList()
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyVerticalStaggeredGrid(
+            columns = StaggeredGridCells.Fixed(2),
+            contentPadding = PaddingValues(5.dp),
+            modifier = Modifier
+                .padding(5.dp)
+                .pointerInput(Unit) {
+                    detectVerticalDragGestures { _, _ -> }
+                },
+            verticalItemSpacing = 10.dp,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            items(nodes.size) { index ->
+                val node = nodes[index]
+                node?.mediaRecommendation?.let {
+                    AnimeGridCard(
+                        navController = navController,
+                        imageUrl = it.coverImage?.large,
+                        title = it.title?.english ?: it.title?.native ?: "",
+                        id = it.id
+                    )
+                }
+            }
+        }
+    }
 }
 
 @Composable
-private fun RecommendationsComponent() {
+private fun ReviewsComponent(reviews: GetMediaDetailsQuery.Reviews) {
+    val nodes = reviews.nodes ?: emptyList()
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyColumn {
+            items(nodes.size) { index ->
+                val node = nodes[index]
+                node?.let {
+                    var expanded by remember { mutableStateOf(false) }
+
+                    ElevatedCard(
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clickable { expanded = !expanded }) {
+                        Column(
+                            modifier = Modifier
+                                .padding(10.dp)
+                        ) {
+                            Column {
+                                Row(
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(it.user?.name ?: "")
+                                    RatingBar(
+                                        value = it.score?.toFloat() ?: 0f,
+                                        style = RatingBarStyle.Default,
+                                        onValueChange = {},
+                                        onRatingChanged = {},
+                                        size = 15.dp,
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(5.dp))
+                                Text(it.summary ?: "")
+                            }
+                            if (expanded) {
+                                HorizontalDivider(
+                                    modifier = Modifier.padding(vertical = 5.dp),
+                                    thickness = 3.dp,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                Text(it.body ?: "")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

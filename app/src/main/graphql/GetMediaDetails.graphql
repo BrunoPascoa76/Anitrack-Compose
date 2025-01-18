@@ -35,6 +35,9 @@ query GetMediaDetails($mediaId: Int) {
                         english
                         native
                     }
+                    coverImage {
+                        large
+                    }
                 }
             }
         }
@@ -104,6 +107,9 @@ query GetMediaDetails($mediaId: Int) {
                 score
                 summary
                 body
+                user{
+                    name
+                }
             }
         }
     }
