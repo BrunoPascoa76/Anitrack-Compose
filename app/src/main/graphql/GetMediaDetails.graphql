@@ -1,0 +1,104 @@
+query GetMediaDetails($mediaId: Int) {
+    Media(id: $mediaId) {
+        type
+        episodes
+        genres
+        siteUrl
+        source
+        trailer {
+            id
+            site
+            thumbnail
+        }
+        title {
+            english
+            native
+        }
+        tags {
+            name
+        }
+        status
+        averageScore
+        bannerImage
+        chapters
+        studios {
+            nodes {
+                id
+                name
+            }
+        }
+        recommendations {
+            nodes {
+                mediaRecommendation {
+                    id
+                    title {
+                        english
+                        native
+                    }
+                }
+            }
+        }
+        externalLinks {
+            icon
+            url
+            site
+        }
+        relations {
+            nodes {
+                id
+                title {
+                    english
+                    native
+                }
+            }
+        }
+        characters {
+            nodes {
+                id
+                name {
+                    last
+                    first
+                }
+                image {
+                    medium
+                }
+            }
+        }
+        coverImage {
+            large
+        }
+        description(asHtml: false)
+        duration
+        endDate {
+            day
+            month
+            year
+        }
+        startDate {
+            day
+            month
+            year
+        }
+        staff {
+            nodes {
+                id
+                name {
+                    first
+                    last
+                }
+                image {
+                    medium
+                }
+            }
+        }
+        format
+        id
+        reviews {
+            nodes {
+                score
+                summary
+                body
+            }
+        }
+    }
+}

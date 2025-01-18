@@ -1,6 +1,7 @@
 package cm.project.anitrack_compose.repositories
 
 import cm.project.anitrack_compose.graphql.GetAiringAnimeCalendarQuery
+import cm.project.anitrack_compose.graphql.GetMediaDetailsQuery
 import cm.project.anitrack_compose.graphql.GetMediaListQuery
 import cm.project.anitrack_compose.graphql.GetMediaListsQuery
 import cm.project.anitrack_compose.graphql.GetUserIdQuery
@@ -101,6 +102,18 @@ class GraphQLRepository @Inject constructor(private val apolloClient: ApolloClie
             ).execute()
             val page = response.data?.Page
             Result.Success(page!!)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+
+    suspend fun getMediaDetails(mediaId: Int): Result<GetMediaDetailsQuery.Media> {
+        return try {
+            val response = apolloClient.query(
+                GetMediaDetailsQuery(Optional.present(mediaId))
+            ).execute()
+            val media = response.data?.Media
+            Result.Success(media!!)
         } catch (e: Exception) {
             Result.Error(e)
         }

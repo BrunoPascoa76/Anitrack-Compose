@@ -47,7 +47,7 @@ fun AnimeGridCard(
 ) {
     ElevatedCard(modifier = modifier
         .fillMaxWidth()
-        .clickable { navController.navigate("anime/$id") }) {
+        .clickable { navController.navigate("media/$id") }) {
         BadgedBox(
             badge = {
                 if (unwatchedEpisodes > 0) Card(

@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import cm.project.anitrack_compose.ui.APISetupScreen
 import cm.project.anitrack_compose.ui.CalendarScreen
+import cm.project.anitrack_compose.ui.MediaDetailsScreen
 import cm.project.anitrack_compose.ui.WatchlistScreen
 import cm.project.anitrack_compose.ui.components.GraphQLWrapper
 import cm.project.anitrack_compose.viewModels.PreferencesViewModel
@@ -39,6 +40,15 @@ fun AppNavHost(
                 CalendarScreen(navController = navController)
             }
         }
+        composable("media/{id}") {
+            GraphQLWrapper(preferencesViewModel) {
+                val id = it.arguments?.getInt("id")
+                if (id == null) navController.navigateUp()
+                MediaDetailsScreen(navController = navController, mediaId = id ?: 0)
+            }
+        }
+
+
         composable("apiSetup") {
             APISetupScreen(
                 preferencesViewModel = preferencesViewModel,
