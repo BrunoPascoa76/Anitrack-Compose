@@ -62,15 +62,18 @@ query GetMediaDetails($mediaId: Int) {
             }
         }
         characters {
-            nodes {
-                id
-                name {
-                    last
-                    first
+            edges {
+                node {
+                    id
+                    name {
+                        last
+                        first
+                    }
+                    image {
+                        medium
+                    }
                 }
-                image {
-                    medium
-                }
+                role
             }
         }
         coverImage {

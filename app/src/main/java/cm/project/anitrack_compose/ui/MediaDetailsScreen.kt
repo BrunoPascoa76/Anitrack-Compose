@@ -22,6 +22,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.rememberScrollState
@@ -65,6 +67,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import cm.project.anitrack_compose.fuzzyDateToString
 import cm.project.anitrack_compose.graphql.GetMediaDetailsQuery
+import cm.project.anitrack_compose.graphql.type.CharacterRole
 import cm.project.anitrack_compose.ui.components.AnimeGridCard
 import cm.project.anitrack_compose.ui.components.LoadingScreen
 import cm.project.anitrack_compose.viewModels.MediaDetailsViewModel
@@ -115,7 +118,7 @@ fun MediaDetailsScreen(mediaId: Int, navController: NavController) {
                 when (selectedTab) {
                     0 -> ExtendedInfoComponent(media!!)
                     1 -> RelationsComponent(media!!.relations!!, navController)
-                    2 -> CharactersComponent()
+                    2 -> CharactersComponent(media!!.characters!!)
                     3 -> StaffComponent()
                     4 -> RecommendationsComponent(media!!.recommendations!!, navController)
                     5 -> ReviewsComponent(media!!.reviews!!)
@@ -444,7 +447,55 @@ private fun RelationsComponent(
 }
 
 @Composable
-private fun CharactersComponent() {
+private fun CharactersComponent(characters: GetMediaDetailsQuery.Characters) {
+    val edges = characters.edges ?: emptyList()
+
+    val groupedCharacters = edges.groupBy { edge -> edge?.role }
+    val sortedGroupedCharacters =
+        listOf(
+            CharacterRole.MAIN,
+            CharacterRole.SUPPORTING,
+            CharacterRole.BACKGROUND,
+            null
+        ).mapNotNull { role ->
+            groupedCharacters[role]?.let { role to it }
+        }
+
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        sortedGroupedCharacters.forEach { (role, characters) ->
+            Text(role.toString().lowercase().replaceFirstChar { it.uppercase() }
+                .replace("_", " "), style = MaterialTheme.typography.titleMedium)
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(4),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                items(characters.size) { index ->
+                    val character = characters[index]
+                    character.let { node ->
+                        ElevatedCard(modifier = Modifier.fillMaxSize()) {
+                            Column {
+                                AsyncImage(
+                                    model = ImageRequest.Builder(LocalContext.current)
+                                        .data(node?.node?.image?.medium).build(),
+                                    contentScale = ContentScale.FillWidth,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                )
+                                Text(
+                                    (node?.node?.name?.first ?: "") + " " + (node?.node?.name?.last
+                                        ?: ""),
+                                    modifier = Modifier.padding(vertical = 5.dp, horizontal = 10.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
