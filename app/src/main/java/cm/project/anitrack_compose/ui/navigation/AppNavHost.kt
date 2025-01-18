@@ -42,9 +42,9 @@ fun AppNavHost(
         }
         composable("media/{id}") {
             GraphQLWrapper(preferencesViewModel) {
-                val id = it.arguments?.getInt("id")
-                if (id == null) navController.navigateUp()
-                MediaDetailsScreen(navController = navController, mediaId = id ?: 0)
+                val id = it.arguments?.getString("id")?.toIntOrNull()
+                if (id == null || id == 0) navController.navigateUp()
+                MediaDetailsScreen(navController = navController, mediaId = id!!)
             }
         }
 
