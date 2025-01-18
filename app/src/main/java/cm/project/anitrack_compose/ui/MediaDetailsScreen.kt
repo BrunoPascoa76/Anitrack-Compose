@@ -56,6 +56,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import cm.project.anitrack_compose.fuzzyDateToString
 import cm.project.anitrack_compose.graphql.GetMediaDetailsQuery
+import cm.project.anitrack_compose.ui.components.AnimeGridCard
 import cm.project.anitrack_compose.ui.components.LoadingScreen
 import cm.project.anitrack_compose.viewModels.MediaDetailsViewModel
 import coil.compose.AsyncImage
@@ -111,7 +112,7 @@ fun MediaDetailsScreen(mediaId: Int, navController: NavController) {
                 item {
                     when (selectedTab) {
                         0 -> ExtendedInfoComponent(media!!)
-                        1 -> RelationsComponent()
+                        1 -> RelationsComponent(media!!.relations!!, navController)
                         2 -> CharactersComponent()
                         3 -> StaffComponent()
                         4 -> RecommendationsComponent()
@@ -334,7 +335,37 @@ private fun TrailerComponent(thumbnail: String?, url: String) {
 }
 
 @Composable
-private fun RelationsComponent() {
+private fun RelationsComponent(
+    relations: GetMediaDetailsQuery.Relations,
+    navController: NavController
+) {
+    val nodes = relations.nodes ?: emptyList()
+    val edges = relations.edges ?: emptyList()
+
+    val groupedRelations = nodes.zip(edges).groupBy { it.second?.relationType ?: "OTHER" }
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        groupedRelations.forEach { (relationType, relationNodes) ->
+            Text(relationType.toString().lowercase().replaceFirstChar { it.uppercase() }
+                .replace("_", " "), style = MaterialTheme.typography.titleMedium)
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                items(relationNodes.size) { index ->
+                    val relationNode = relationNodes[index]
+                    relationNode.first?.let { node ->
+                        AnimeGridCard(
+                            modifier = Modifier.width(150.dp),
+                            navController = navController,
+                            imageUrl = node.coverImage?.large,
+                            title = node.title?.english ?: node.title?.native ?: "",
+                            id = node.id
+                        )
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable

@@ -98,7 +98,7 @@ fun AnimeGridCard(
                 }
             }
         ) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.BottomCenter) {
                 if (imageUrl != null) {
                     ImageComponent(imageUrl)
                 }
@@ -131,6 +131,7 @@ private fun TitleComponent(title: String) {
         modifier = Modifier
             .fillMaxWidth()
             .background(gradient)
+            .width(100.dp)
             .height(80.dp),
         contentAlignment = Alignment.BottomCenter
     ) {

@@ -50,6 +50,12 @@ query GetMediaDetails($mediaId: Int) {
                     english
                     native
                 }
+                coverImage {
+                    large
+                }
+            }
+            edges {
+                relationType
             }
         }
         characters {
