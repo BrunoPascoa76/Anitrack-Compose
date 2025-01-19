@@ -27,7 +27,7 @@ class DiscoverMediaPage @Inject constructor(
                 LoadResult.Page(
                     data = data,
                     prevKey = if (page == 1) null else page - 1,
-                    nextKey = if (result.data.pageInfo?.hasNextPage == true) null else page + 1
+                    nextKey = if (result.data.pageInfo?.hasNextPage == true) page + 1 else null
                 )
             }
 
