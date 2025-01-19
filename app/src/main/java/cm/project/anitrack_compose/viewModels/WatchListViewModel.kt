@@ -69,6 +69,8 @@ class WatchListViewModel @Inject constructor(private val graphQLRepository: Grap
                 }
             }
         }
+        if (_userId == null) return
+
         when (val result = graphQLRepository.getMediaList(_userId!!, status)) {
             is Result.Success -> {
                 if (status == MediaListStatus.CURRENT) {

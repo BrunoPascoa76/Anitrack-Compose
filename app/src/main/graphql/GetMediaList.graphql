@@ -8,6 +8,7 @@ query GetMediaList($userId: Int, $status: MediaListStatus, $type: MediaType, $so
                     title {
                         english
                         native
+                        userPreferred
                     }
                     coverImage {
                         large

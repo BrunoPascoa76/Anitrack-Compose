@@ -132,7 +132,8 @@ private fun Calendar(
                 if (entry != null) {
                     AnimeGridCard(
                         navController = navController,
-                        title = entry.media?.title?.english ?: entry.media?.title?.native ?: "",
+                        title = entry.media?.title?.english ?: entry.media?.title?.native
+                        ?: entry.media?.title?.userPreferred ?: "",
                         id = entry.media?.id ?: 0,
                         imageUrl = entry.media?.coverImage?.large,
                         airingAt = entry.airingAt

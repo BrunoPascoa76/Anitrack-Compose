@@ -7,6 +7,7 @@ query GetAiringAnimeCalendar($airingAtGreater: Int, $airingAtLesser: Int, $sort:
                 title {
                     english
                     native
+                    userPreferred
                 }
                 id
                 coverImage {

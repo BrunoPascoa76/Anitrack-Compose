@@ -195,7 +195,7 @@ private fun BasicInfoComponent(media: GetMediaDetailsQuery.Media) {
                     .padding(horizontal = 10.dp, vertical = 5.dp)
             ) {
                 Text(
-                    media.title?.english ?: media.title?.native ?: "",
+                    media.title?.english ?: media.title?.native ?: media.title?.userPreferred ?: "",
                     fontWeight = FontWeight.Bold
                 )
                 HorizontalDivider(thickness = 3.dp, color = MaterialTheme.colorScheme.primary)

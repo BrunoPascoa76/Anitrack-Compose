@@ -1,14 +1,18 @@
 package cm.project.anitrack_compose.repositories
 
+import cm.project.anitrack_compose.graphql.DiscoverMediaPageQuery
 import cm.project.anitrack_compose.graphql.GetAiringAnimeCalendarQuery
 import cm.project.anitrack_compose.graphql.GetMediaDetailsQuery
 import cm.project.anitrack_compose.graphql.GetMediaListQuery
 import cm.project.anitrack_compose.graphql.GetMediaListsQuery
 import cm.project.anitrack_compose.graphql.GetUserIdQuery
+import cm.project.anitrack_compose.graphql.SearchMediaPageQuery
 import cm.project.anitrack_compose.graphql.UserProfilePictureQuery
 import cm.project.anitrack_compose.graphql.type.AiringSort
 import cm.project.anitrack_compose.graphql.type.MediaListSort
 import cm.project.anitrack_compose.graphql.type.MediaListStatus
+import cm.project.anitrack_compose.graphql.type.MediaSeason
+import cm.project.anitrack_compose.graphql.type.MediaSort
 import cm.project.anitrack_compose.graphql.type.MediaType
 import cm.project.anitrack_compose.models.User
 import com.apollographql.apollo3.ApolloClient
@@ -114,6 +118,46 @@ class GraphQLRepository @Inject constructor(private val apolloClient: ApolloClie
             ).execute()
             val media = response.data?.Media
             Result.Success(media!!)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+
+    suspend fun getDiscoverPage(
+        page: Int,
+        sort: List<MediaSort>,
+        seasonYear: Int? = null,
+        season: MediaSeason? = null
+    ): Result<DiscoverMediaPageQuery.Page> {
+        return try {
+            val response = apolloClient.query(
+                DiscoverMediaPageQuery(
+                    Optional.present(page),
+                    Optional.present(sort),
+                    Optional.presentIfNotNull(seasonYear),
+                    Optional.presentIfNotNull(season)
+                )
+            ).execute()
+            val pageData = response.data?.Page
+            Result.Success(pageData!!)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+
+    suspend fun searchMedia(
+        page: Int,
+        query: String,
+    ): Result<SearchMediaPageQuery.Page> {
+        return try {
+            val response = apolloClient.query(
+                SearchMediaPageQuery(
+                    Optional.present(page),
+                    Optional.present(query)
+                )
+            ).execute()
+            val pageData = response.data?.Page
+            Result.Success(pageData!!)
         } catch (e: Exception) {
             Result.Error(e)
         }

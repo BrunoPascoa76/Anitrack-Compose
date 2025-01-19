@@ -8,7 +8,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import cm.project.anitrack_compose.ui.APISetupScreen
 import cm.project.anitrack_compose.ui.CalendarScreen
+import cm.project.anitrack_compose.ui.DiscoverScreen
 import cm.project.anitrack_compose.ui.MediaDetailsScreen
+import cm.project.anitrack_compose.ui.SearchScreen
 import cm.project.anitrack_compose.ui.WatchlistScreen
 import cm.project.anitrack_compose.ui.components.GraphQLWrapper
 import cm.project.anitrack_compose.viewModels.PreferencesViewModel
@@ -45,6 +47,17 @@ fun AppNavHost(
                 val id = it.arguments?.getString("id")?.toIntOrNull()
                 if (id == null || id == 0) navController.navigateUp()
                 MediaDetailsScreen(navController = navController, mediaId = id!!)
+            }
+        }
+        composable("explore") {
+            GraphQLWrapper(preferencesViewModel) {
+                DiscoverScreen(navController = navController)
+            }
+        }
+        composable("search/{query}") {
+            val query = it.arguments?.getString("query")
+            GraphQLWrapper(preferencesViewModel) {
+                SearchScreen(navController = navController, query = query ?: "")
             }
         }
 

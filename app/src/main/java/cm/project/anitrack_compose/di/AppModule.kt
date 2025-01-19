@@ -2,6 +2,7 @@ package cm.project.anitrack_compose.di
 
 import android.content.Context
 import cm.project.anitrack_compose.repositories.AuthorizationInterceptor
+import cm.project.anitrack_compose.repositories.GraphQLRepository
 import cm.project.anitrack_compose.repositories.PreferencesRepository
 import com.apollographql.apollo3.ApolloClient
 import com.apollographql.apollo3.network.okHttpClient
@@ -21,6 +22,12 @@ object AppModule {
     @Singleton
     fun providePreferencesRepository(@ApplicationContext context: Context): PreferencesRepository {
         return PreferencesRepository(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGraphQlRepository(apolloClient: ApolloClient): GraphQLRepository {
+        return GraphQLRepository(apolloClient)
     }
 
     @Provides
