@@ -6,8 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class SearchViewModel @Inject constructor(private val repository: GraphQLRepository) : ViewModel() {
-    suspend fun searchMedia(query: String, page: Int) {
+class SearchViewModel @Inject constructor(private val graphQLRepository: GraphQLRepository) :
+    ViewModel() {
 
-    }
 }

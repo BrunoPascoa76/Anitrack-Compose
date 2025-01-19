@@ -53,8 +53,11 @@ fun AppNavHost(
                 DiscoverScreen(navController = navController)
             }
         }
-        composable("search/{query}/{page}") {
-            GraphQLWrapper(preferencesViewModel) {}
+        composable("search/{query}") {
+            val query = it.arguments?.getString("query")
+            GraphQLWrapper(preferencesViewModel) {
+
+            }
         }
 
 

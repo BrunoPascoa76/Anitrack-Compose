@@ -1,0 +1,21 @@
+query DiscoverMediaPage($page: Int, $sort: [MediaSort], $seasonYear: Int, $season: MediaSeason) {
+    Page(page: $page, perPage: 20) {
+        media(sort: $sort, seasonYear: $seasonYear, season: $season) {
+            id
+            episodes
+            title {
+                english
+                native
+                userPreferred
+            }
+            coverImage {
+                large
+            }
+        }
+        pageInfo {
+            hasNextPage
+            currentPage
+            lastPage
+        }
+    }
+}
