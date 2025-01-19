@@ -143,12 +143,14 @@ private fun BannerComponent(navController: NavController, imageUrl: String?) {
             .fillMaxWidth()
             .padding(bottom = 5.dp)
     ) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current).data(imageUrl).build(),
-            contentDescription = null,
-            contentScale = ContentScale.FillWidth,
-            modifier = Modifier.fillMaxWidth()
-        )
+        imageUrl?.let {
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current).data(imageUrl).build(),
+                contentDescription = null,
+                contentScale = ContentScale.FillWidth,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
         Row(
             verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.SpaceBetween,
