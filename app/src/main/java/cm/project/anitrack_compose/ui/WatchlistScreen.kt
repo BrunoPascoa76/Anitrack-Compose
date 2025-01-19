@@ -30,6 +30,7 @@ import androidx.navigation.compose.rememberNavController
 import cm.project.anitrack_compose.graphql.type.MediaListStatus
 import cm.project.anitrack_compose.ui.components.AnimeGridCard
 import cm.project.anitrack_compose.ui.components.BottomNavBar
+import cm.project.anitrack_compose.ui.components.RateLimitWarning
 import cm.project.anitrack_compose.viewModels.WatchListViewModel
 import kotlin.math.max
 
@@ -40,6 +41,7 @@ fun WatchlistScreen(
     watchListViewModel: WatchListViewModel = hiltViewModel()
 ) {
     val selectedIndex by watchListViewModel.selectedStatus.collectAsState()
+    val isBeingRateLimited by watchListViewModel.isBeingRateLimited.collectAsState()
     Scaffold(
         topBar = {
             Column {
@@ -72,6 +74,7 @@ fun WatchlistScreen(
                 1 -> WatchListScreen(navController, possibleStatuses[1])
                 2 -> WatchListScreen(navController, possibleStatuses[2])
             }
+            RateLimitWarning(isBeingRateLimited)
         }
     }
 }

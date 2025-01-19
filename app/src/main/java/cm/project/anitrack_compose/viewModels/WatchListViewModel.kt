@@ -6,6 +6,7 @@ import cm.project.anitrack_compose.graphql.GetMediaListQuery.Entry
 import cm.project.anitrack_compose.graphql.type.MediaListStatus
 import cm.project.anitrack_compose.repositories.GraphQLRepository
 import cm.project.anitrack_compose.repositories.Result
+import com.apollographql.apollo3.exception.ApolloHttpException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -29,6 +30,9 @@ class WatchListViewModel @Inject constructor(private val graphQLRepository: Grap
     private val _selectedIndex = MutableStateFlow(0)
     val selectedStatus = _selectedIndex.asStateFlow()
 
+    private val _isBeingRateLimited = MutableStateFlow(false)
+    val isBeingRateLimited = _isBeingRateLimited.asStateFlow()
+
     fun startRefreshing(status: MediaListStatus) {
         _isRefreshing = true
         refreshJob = viewModelScope.launch {
@@ -51,6 +55,7 @@ class WatchListViewModel @Inject constructor(private val graphQLRepository: Grap
     }
 
     private suspend fun refresh(status: MediaListStatus) {
+        _isBeingRateLimited.value = false
         if (_userId == null) {
             when (val result = graphQLRepository.getUserId()) {
                 is Result.Success -> {
@@ -58,7 +63,9 @@ class WatchListViewModel @Inject constructor(private val graphQLRepository: Grap
                 }
 
                 is Result.Error -> {
-                    return
+                    if (result.exception is ApolloHttpException && result.exception.statusCode == 429) {
+                        _isBeingRateLimited.value = true
+                    }
                 }
             }
         }
@@ -71,7 +78,11 @@ class WatchListViewModel @Inject constructor(private val graphQLRepository: Grap
                 }
             }
 
-            is Result.Error -> {}
+            is Result.Error -> {
+                if (result.exception is ApolloHttpException && result.exception.statusCode == 429) {
+                    _isBeingRateLimited.value = true
+                }
+            }
         }
     }
 

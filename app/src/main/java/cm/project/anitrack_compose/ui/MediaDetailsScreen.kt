@@ -68,6 +68,7 @@ import cm.project.anitrack_compose.graphql.GetMediaDetailsQuery
 import cm.project.anitrack_compose.graphql.type.CharacterRole
 import cm.project.anitrack_compose.ui.components.AnimeGridCard
 import cm.project.anitrack_compose.ui.components.LoadingScreen
+import cm.project.anitrack_compose.ui.components.RateLimitWarning
 import cm.project.anitrack_compose.viewModels.MediaDetailsViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -80,6 +81,7 @@ fun MediaDetailsScreen(mediaId: Int, navController: NavController) {
     val mediaDetailsViewModel: MediaDetailsViewModel = hiltViewModel()
     val media by mediaDetailsViewModel.media.collectAsState()
     val selectedTab by mediaDetailsViewModel.selectedTab.collectAsState()
+    val isBeingRateLimited by mediaDetailsViewModel.isBeingRateLimited.collectAsState()
 
     LaunchedEffect(Unit) {
         mediaDetailsViewModel.getMediaDetails(mediaId)
@@ -87,44 +89,47 @@ fun MediaDetailsScreen(mediaId: Int, navController: NavController) {
 
     if (media != null) {
         Scaffold { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .padding(innerPadding)
-            ) {
-                BannerComponent(navController, media!!.bannerImage)
-                BasicInfoComponent(media!!)
-                val tabs = listOf(
-                    "Details",
-                    "Relations",
-                    "Characters",
-                    "Staff",
-                    "Recommendations",
-                    "Reviews"
-                )
-                ScrollableTabRow(selectedTabIndex = selectedTab) {
-                    tabs.forEachIndexed { index, title ->
-                        Tab(
-                            selected = selectedTab == index,
-                            onClick = {
-                                if (selectedTab != index) mediaDetailsViewModel.setSelectedTab(
-                                    index
-                                )
-                            },
-                            text = { Text(title) })
+            Box(modifier = Modifier.padding(innerPadding)) {
+                Column {
+                    BannerComponent(navController, media!!.bannerImage)
+                    BasicInfoComponent(media!!)
+                    val tabs = listOf(
+                        "Details",
+                        "Relations",
+                        "Characters",
+                        "Staff",
+                        "Recommendations",
+                        "Reviews"
+                    )
+                    ScrollableTabRow(selectedTabIndex = selectedTab) {
+                        tabs.forEachIndexed { index, title ->
+                            Tab(
+                                selected = selectedTab == index,
+                                onClick = {
+                                    if (selectedTab != index) mediaDetailsViewModel.setSelectedTab(
+                                        index
+                                    )
+                                },
+                                text = { Text(title) })
+                        }
+                    }
+                    when (selectedTab) {
+                        0 -> ExtendedInfoComponent(media!!)
+                        1 -> RelationsComponent(media!!.relations!!, navController)
+                        2 -> CharactersComponent(media!!.characters!!)
+                        3 -> StaffComponent(media!!.staff!!)
+                        4 -> RecommendationsComponent(media!!.recommendations!!, navController)
+                        5 -> ReviewsComponent(media!!.reviews!!)
                     }
                 }
-                when (selectedTab) {
-                    0 -> ExtendedInfoComponent(media!!)
-                    1 -> RelationsComponent(media!!.relations!!, navController)
-                    2 -> CharactersComponent(media!!.characters!!)
-                    3 -> StaffComponent(media!!.staff!!)
-                    4 -> RecommendationsComponent(media!!.recommendations!!, navController)
-                    5 -> ReviewsComponent(media!!.reviews!!)
-                }
+                RateLimitWarning(isBeingRateLimited)
             }
         }
     } else {
-        LoadingScreen()
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            LoadingScreen()
+            RateLimitWarning(isBeingRateLimited)
+        }
     }
 }
 
