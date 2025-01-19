@@ -39,10 +39,11 @@ import androidx.navigation.NavController
 fun Searchbar(
     navController: NavController,
     modifier: Modifier = Modifier,
-    title: @Composable () -> Unit
+    title: @Composable () -> Unit,
+    initialQuery: String = ""
 ) {
     var isSearching by remember { mutableStateOf(false) }
-    var searchQuery by remember { mutableStateOf("") }
+    var searchQuery by remember { mutableStateOf(initialQuery) }
     var isFocused by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
@@ -68,13 +69,17 @@ fun Searchbar(
                             onValueChange = { searchQuery = it },
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                            keyboardActions = KeyboardActions(onDone = { navController.navigate("search/$searchQuery/1");focusManager.clearFocus() }),
+                            keyboardActions = KeyboardActions(onDone = {
+                                if (searchQuery.isNotEmpty()) navController.navigate(
+                                    "search/$searchQuery"
+                                );focusManager.clearFocus()
+                            }),
                             modifier = Modifier.onFocusChanged { isFocused = it.isFocused },
-                            textStyle = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
-                            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary)
+                            textStyle = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.onSurface),
+                            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                         )
                         if (searchQuery.isEmpty() && !isFocused) {
-                            Text("Search...", style = MaterialTheme.typography.bodyMedium)
+                            Text("Search...", style = MaterialTheme.typography.bodyLarge)
                         }
                     }
                 }

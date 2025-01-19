@@ -1,0 +1,21 @@
+query SearchMediaPage($page: Int, $search: String) {
+    Page(page: $page, perPage: 20) {
+        media(sort: SEARCH_MATCH, search: $search, type: ANIME) {
+            id
+            episodes
+            title {
+                english
+                native
+                userPreferred
+            }
+            coverImage {
+                large
+            }
+        }
+        pageInfo {
+            hasNextPage
+            currentPage
+            lastPage
+        }
+    }
+}
