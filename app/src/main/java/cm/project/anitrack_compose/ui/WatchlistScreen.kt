@@ -117,7 +117,8 @@ fun WatchListScreen(
                                 ?: 1) - (entry.progress
                                     ?: 0) - 1)
                             ) else 0,
-                        title = entry.media?.title?.english ?: entry.media?.title?.native ?: "",
+                        title = entry.media?.title?.english ?: entry.media?.title?.native
+                        ?: entry.media?.title?.userPreferred ?: "",
                         id = entry.media?.id ?: 0,
                         imageUrl = entry.media?.coverImage?.large
                     )

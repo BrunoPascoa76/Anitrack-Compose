@@ -3,6 +3,7 @@ package cm.project.anitrack_compose.ui.components
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Icon
@@ -41,6 +42,14 @@ fun BottomNavBar(navController: NavController) {
             selected = currentRoute == "calendar",
             onClick = {
                 if (currentRoute != "calendar") navController.navigate("calendar")
+            }
+        )
+        NavigationBarItem(
+            icon = { Icon(Icons.Filled.Explore, contentDescription = "Explore") },
+            label = { Text("Explore") },
+            selected = currentRoute == "explore",
+            onClick = {
+                if (currentRoute != "explore") navController.navigate("explore")
             }
         )
 //        NavigationBarItem(

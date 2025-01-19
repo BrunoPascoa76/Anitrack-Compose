@@ -13,6 +13,7 @@ query GetMediaDetails($mediaId: Int) {
         title {
             english
             native
+            userPreferred
         }
         tags {
             name
@@ -34,6 +35,7 @@ query GetMediaDetails($mediaId: Int) {
                     title {
                         english
                         native
+                        userPreferred
                     }
                     coverImage {
                         large
@@ -52,6 +54,7 @@ query GetMediaDetails($mediaId: Int) {
                 title {
                     english
                     native
+                    userPreferred
                 }
                 coverImage {
                     large
