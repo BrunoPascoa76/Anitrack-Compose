@@ -3,6 +3,9 @@ package cm.project.anitrack_compose.ui
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,7 +33,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Label
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Sell
+import androidx.compose.material.icons.outlined.Bookmark
 import androidx.compose.material.icons.outlined.PlayCircle
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
@@ -61,13 +66,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import cm.project.anitrack_compose.fuzzyDateToString
 import cm.project.anitrack_compose.graphql.GetMediaDetailsQuery
+import cm.project.anitrack_compose.graphql.GetMediaListEntryQuery
 import cm.project.anitrack_compose.graphql.type.CharacterRole
 import cm.project.anitrack_compose.ui.components.AnimeGridCard
 import cm.project.anitrack_compose.ui.components.LoadingScreen
+import cm.project.anitrack_compose.ui.components.MediaListEntryDisplay
 import cm.project.anitrack_compose.ui.components.RateLimitWarning
 import cm.project.anitrack_compose.viewModels.MediaDetailsViewModel
 import coil.compose.AsyncImage
@@ -82,16 +90,22 @@ fun MediaDetailsScreen(mediaId: Int, navController: NavController) {
     val media by mediaDetailsViewModel.media.collectAsState()
     val selectedTab by mediaDetailsViewModel.selectedTab.collectAsState()
     val isBeingRateLimited by mediaDetailsViewModel.isBeingRateLimited.collectAsState()
+    val mediaListEntry by mediaDetailsViewModel.mediaListEntry.collectAsState()
+
+    val showMediaListEntryPopup by mediaDetailsViewModel.showMediaListEntryPopup.collectAsState()
 
     LaunchedEffect(Unit) {
         mediaDetailsViewModel.getMediaDetails(mediaId)
     }
 
+    if (media != null) mediaDetailsViewModel.getMediaListEntry()
+
+
     if (media != null) {
         Scaffold { innerPadding ->
             Box(modifier = Modifier.padding(innerPadding)) {
                 Column {
-                    BannerComponent(navController, media!!.bannerImage)
+                    BannerComponent(navController, media!!.bannerImage, mediaListEntry)
                     BasicInfoComponent(media!!)
                     val tabs = listOf(
                         "Details",
@@ -122,6 +136,19 @@ fun MediaDetailsScreen(mediaId: Int, navController: NavController) {
                         5 -> ReviewsComponent(media!!.reviews!!)
                     }
                 }
+                AnimatedVisibility(
+                    visible = showMediaListEntryPopup,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    Dialog(
+                        onDismissRequest = { mediaDetailsViewModel.toggleMediaListEntryPopup() }
+                    ) {
+                        MediaListEntryDisplay(
+                            mediaDetailsViewModel = mediaDetailsViewModel,
+                            onDismiss = { mediaDetailsViewModel.toggleMediaListEntryPopup() })
+                    }
+                }
                 RateLimitWarning(isBeingRateLimited)
             }
         }
@@ -134,7 +161,13 @@ fun MediaDetailsScreen(mediaId: Int, navController: NavController) {
 }
 
 @Composable
-private fun BannerComponent(navController: NavController, imageUrl: String?) {
+private fun BannerComponent(
+    navController: NavController,
+    imageUrl: String?,
+    mediaListEntry: GetMediaListEntryQuery.MediaList?
+) {
+    val mediaDetailsViewModel: MediaDetailsViewModel = hiltViewModel()
+
     val gradient = Brush.verticalGradient(
         colors = listOf(
             Color.Black.copy(alpha = 0.5f),
@@ -166,6 +199,13 @@ private fun BannerComponent(navController: NavController, imageUrl: String?) {
             IconButton(onClick = { navController.navigateUp() }) {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = null,
+                    tint = Color.White
+                )
+            }
+            IconButton(onClick = { mediaDetailsViewModel.toggleMediaListEntryPopup() }) {
+                Icon(
+                    if (mediaListEntry == null) Icons.Outlined.Bookmark else Icons.Filled.Bookmark,
                     contentDescription = null,
                     tint = Color.White
                 )

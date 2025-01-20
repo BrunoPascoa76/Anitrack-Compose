@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.paging.runtime.ktx)
     implementation(libs.androidx.paging.compose)
+    implementation(libs.androidx.ui.test.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -88,6 +89,7 @@ dependencies {
     kapt(libs.hilt.compiler.v250)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.compose.ratingbar)
+    implementation(libs.compose.wheel.picker.v100rc02)
 }
 
 apollo {

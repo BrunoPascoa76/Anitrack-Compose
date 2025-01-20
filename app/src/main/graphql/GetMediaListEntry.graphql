@@ -1,0 +1,19 @@
+query GetMediaListEntry ($userId: Int, $mediaId: Int){
+    MediaList(userId: $userId,mediaId: $mediaId){
+        id
+        progress
+        progressVolumes
+        status
+        startedAt {
+            year
+            month
+            day
+        }
+        completedAt {
+            year
+            month
+            day
+        }
+        score(format: POINT_5)
+    }
+}

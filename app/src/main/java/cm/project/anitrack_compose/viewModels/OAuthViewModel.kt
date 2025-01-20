@@ -10,7 +10,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-import okhttp3.internal.wait
 import javax.inject.Inject
 
 @HiltViewModel
@@ -55,7 +54,7 @@ class OAuthViewModel @Inject constructor(
 
     fun cleanupExpiredAccessToken() {
         viewModelScope.launch {
-            preferencesRepository.cleanupExpiredAccessToken().wait()
+            preferencesRepository.cleanupExpiredAccessToken()
             if (accessToken.firstOrNull() == null) {
                 startAuth(preferencesRepository.clientId.firstOrNull()!!)
             }
