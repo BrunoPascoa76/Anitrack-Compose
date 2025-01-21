@@ -4,6 +4,7 @@ apolloNormalizedCache = "3.8.5"
 apolloRuntime = "3.8.5"
 appauth = "0.11.1"
 coilCompose = "2.4.0"
+composecalendar = "1.1.0"
 composeRatingbar = "1.3.12"
 composeWheelPicker = "version"
 composeWheelPickerVersion = "Tag"
@@ -50,6 +51,7 @@ compose-ratingbar = { module = "com.github.a914-gowtham:compose-ratingbar", vers
 compose-wheel-picker = { module = "com.github.your-library:compose-wheel-picker", version.ref = "composeWheelPicker" }
 compose-wheel-picker-v100rc02 = { module = "com.github.zj565061763:compose-wheel-picker", version.ref = "githubComposeWheelPickerVersion" }
 compose-wheel-picker-vlatestversion = { module = "com.github.zj565061763:compose-wheel-picker", version.ref = "githubComposeWheelPicker" }
+composecalendar = { module = "com.github.OrlanDroyd:ComposeCalendar", version.ref = "composecalendar" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-v250 = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroidVersion" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltAndroid" }

@@ -29,7 +29,7 @@ class MediaDetailsViewModel @Inject constructor(private val graphQLRepository: G
     private val _isBeingRateLimited = MutableStateFlow(false)
     val isBeingRateLimited = _isBeingRateLimited.asStateFlow()
 
-    private val _mediaListEntry = MutableStateFlow<GetMediaListEntryQuery.MediaList?>(null)
+    private val _mediaListEntry = MutableStateFlow<MediaListEntryInput?>(null)
     val mediaListEntry = _mediaListEntry.asStateFlow()
 
     private val _showMediaListEntryPopup = MutableStateFlow(false)
@@ -58,6 +58,39 @@ class MediaDetailsViewModel @Inject constructor(private val graphQLRepository: G
         }
     }
 
+
+    fun setStatus(status: MediaListStatus?) {
+        _mediaListEntry.value = _mediaListEntry.value?.copy(status = status)
+    }
+
+    fun setStartedAt(startedAt: LocalDate?) {
+        _mediaListEntry.value = _mediaListEntry.value?.copy(
+            startedAt = GetMediaListEntryQuery.StartedAt(
+                year = startedAt?.year,
+                month = startedAt?.monthValue,
+                day = startedAt?.dayOfMonth
+            )
+        )
+    }
+
+    fun setCompletedAt(completedAt: LocalDate?) {
+        _mediaListEntry.value = _mediaListEntry.value?.copy(
+            completedAt = GetMediaListEntryQuery.CompletedAt(
+                year = completedAt?.year,
+                month = completedAt?.monthValue,
+                day = completedAt?.dayOfMonth
+            )
+        )
+    }
+
+    fun setScore(score: Int) {
+        _mediaListEntry.value = _mediaListEntry.value?.copy(score = score)
+    }
+
+    fun setProgress(progress: Int) {
+        _mediaListEntry.value = _mediaListEntry.value?.copy(progress = progress)
+    }
+
     fun getMediaListEntry() {
         _media.value?.let {
             viewModelScope.launch {
@@ -79,10 +112,17 @@ class MediaDetailsViewModel @Inject constructor(private val graphQLRepository: G
                     when (val result =
                         graphQLRepository.getMediaListEntry(userId!!, it.id)) {
                         is Result.Success -> {
-                            _mediaListEntry.value = result.data
+                            _mediaListEntry.value = MediaListEntryInput(
+                                status = result.data?.status,
+                                progress = result.data?.progress,
+                                score = result.data?.score?.toInt(),
+                                startedAt = result.data?.startedAt,
+                                completedAt = result.data?.completedAt,
+                            )
                         }
 
-                        is Result.Error -> {
+                        is Result.Error -> { //note if not in list, will give 404, which is still a "success" in this scenario
+                            _mediaListEntry.value = null
                             if (result.exception is ApolloHttpException && result.exception.statusCode == 429) {
                                 _isBeingRateLimited.value = true
                             }
@@ -143,3 +183,11 @@ class MediaDetailsViewModel @Inject constructor(private val graphQLRepository: G
         _selectedTab.value = tab
     }
 }
+
+data class MediaListEntryInput(
+    val status: MediaListStatus? = MediaListStatus.PLANNING,
+    val progress: Int? = 0,
+    val score: Int? = null,
+    val startedAt: GetMediaListEntryQuery.StartedAt? = null,
+    val completedAt: GetMediaListEntryQuery.CompletedAt? = null,
+)

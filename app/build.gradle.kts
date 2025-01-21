@@ -90,6 +90,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.compose.ratingbar)
     implementation(libs.compose.wheel.picker.v100rc02)
+    implementation(libs.composecalendar)
 }
 
 apollo {

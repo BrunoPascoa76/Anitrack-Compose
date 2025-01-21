@@ -6,7 +6,6 @@ import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -35,7 +34,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Sell
-import androidx.compose.material.icons.outlined.Bookmark
+import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.PlayCircle
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
@@ -71,19 +70,18 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import cm.project.anitrack_compose.fuzzyDateToString
 import cm.project.anitrack_compose.graphql.GetMediaDetailsQuery
-import cm.project.anitrack_compose.graphql.GetMediaListEntryQuery
 import cm.project.anitrack_compose.graphql.type.CharacterRole
 import cm.project.anitrack_compose.ui.components.AnimeGridCard
 import cm.project.anitrack_compose.ui.components.LoadingScreen
 import cm.project.anitrack_compose.ui.components.MediaListEntryDisplay
 import cm.project.anitrack_compose.ui.components.RateLimitWarning
 import cm.project.anitrack_compose.viewModels.MediaDetailsViewModel
+import cm.project.anitrack_compose.viewModels.MediaListEntryInput
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.gowtham.ratingbar.RatingBar
 import com.gowtham.ratingbar.RatingBarStyle
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MediaDetailsScreen(mediaId: Int, navController: NavController) {
     val mediaDetailsViewModel: MediaDetailsViewModel = hiltViewModel()
@@ -136,20 +134,22 @@ fun MediaDetailsScreen(mediaId: Int, navController: NavController) {
                         5 -> ReviewsComponent(media!!.reviews!!)
                     }
                 }
-                AnimatedVisibility(
-                    visible = showMediaListEntryPopup,
-                    enter = fadeIn(),
-                    exit = fadeOut()
-                ) {
-                    Dialog(
-                        onDismissRequest = { mediaDetailsViewModel.toggleMediaListEntryPopup() }
-                    ) {
-                        MediaListEntryDisplay(
-                            mediaDetailsViewModel = mediaDetailsViewModel,
-                            onDismiss = { mediaDetailsViewModel.toggleMediaListEntryPopup() })
-                    }
-                }
                 RateLimitWarning(isBeingRateLimited)
+            }
+        }
+        AnimatedVisibility(
+            visible = showMediaListEntryPopup,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Dialog(
+                onDismissRequest = { mediaDetailsViewModel.toggleMediaListEntryPopup() }
+            ) {
+                MediaListEntryDisplay(
+                    mediaDetailsViewModel = mediaDetailsViewModel,
+                    onDismiss = { mediaDetailsViewModel.toggleMediaListEntryPopup() },
+                    episodes = media!!.episodes
+                )
             }
         }
     } else {
@@ -164,7 +164,7 @@ fun MediaDetailsScreen(mediaId: Int, navController: NavController) {
 private fun BannerComponent(
     navController: NavController,
     imageUrl: String?,
-    mediaListEntry: GetMediaListEntryQuery.MediaList?
+    mediaListEntry: MediaListEntryInput?
 ) {
     val mediaDetailsViewModel: MediaDetailsViewModel = hiltViewModel()
 
@@ -205,7 +205,7 @@ private fun BannerComponent(
             }
             IconButton(onClick = { mediaDetailsViewModel.toggleMediaListEntryPopup() }) {
                 Icon(
-                    if (mediaListEntry == null) Icons.Outlined.Bookmark else Icons.Filled.Bookmark,
+                    if (mediaListEntry == null) Icons.Outlined.BookmarkBorder else Icons.Filled.Bookmark,
                     contentDescription = null,
                     tint = Color.White
                 )
