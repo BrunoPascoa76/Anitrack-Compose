@@ -5,14 +5,21 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -48,86 +55,140 @@ fun MediaListEntryDisplay(
 ) {
     val mediaListEntry by mediaDetailsViewModel.mediaListEntry.collectAsState()
 
-    ElevatedCard(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(200.dp)
-    ) {
-        Column {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text("Edit list entry")
-                IconButton(onClick = { onDismiss() }) {
-                    Icon(
-                        Icons.Filled.Clear,
-                        contentDescription = "Close"
+    val isInLibrary by mediaDetailsViewModel.isInLibrary.collectAsState()
+    val isChanged by mediaDetailsViewModel.isChanged.collectAsState()
+
+    var isConfirmationPopupVisible by remember { mutableStateOf(false) }
+
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        ElevatedCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(250.dp)
+        ) {
+            Column {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Edit list entry")
+                    IconButton(onClick = { onDismiss() }) {
+                        Icon(
+                            Icons.Filled.Clear,
+                            contentDescription = "Close"
+                        )
+                    }
+                }
+                HorizontalDivider()
+                StatusDisplay(
+                    modifier = Modifier.height(50.dp),
+                    value = mediaListEntry?.status,
+                    onStatusSelected = { mediaDetailsViewModel.setStatus(it) }
+                )
+                HorizontalDivider()
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+
+                    VerticalDivider()
+                    NumberDisplay(
+                        modifier = Modifier.weight(1f),
+                        value = mediaListEntry?.progress ?: 0,
+                        onNumberSelected = { mediaDetailsViewModel.setProgress(it) },
+                        maxValue = episodes
+                    )
+                    VerticalDivider()
+                    NumberDisplay(
+                        modifier = Modifier.weight(1f),
+                        value = mediaListEntry?.score ?: 0,
+                        onNumberSelected = { mediaDetailsViewModel.setScore(it) },
+                        maxValue = 5
                     )
                 }
-            }
-            HorizontalDivider()
-            StatusDisplay(
-                modifier = Modifier.height(50.dp),
-                value = mediaListEntry?.status,
-                onStatusSelected = { mediaDetailsViewModel.setStatus(it) }
-            )
-            HorizontalDivider()
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-
-                VerticalDivider()
-                NumberDisplay(
-                    modifier = Modifier.weight(1f),
-                    value = mediaListEntry?.progress ?: 0,
-                    onNumberSelected = { mediaDetailsViewModel.setProgress(it) },
-                    maxValue = episodes
-                )
-                VerticalDivider()
-                NumberDisplay(
-                    modifier = Modifier.weight(1f),
-                    value = mediaListEntry?.score ?: 0,
-                    onNumberSelected = { mediaDetailsViewModel.setScore(it) },
-                    maxValue = 5
-                )
-            }
-            HorizontalDivider()
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                DateDisplay(
-                    modifier = Modifier.weight(1f),
-                    value = fuzzyDateToString(
-                        day = mediaListEntry?.startedAt?.day,
-                        month = mediaListEntry?.startedAt?.month,
-                        year = mediaListEntry?.startedAt?.year
-                    ), onDateSelected = {
-                        mediaDetailsViewModel.setStartedAt(it)
+                HorizontalDivider()
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    DateDisplay(
+                        modifier = Modifier.weight(1f),
+                        value = fuzzyDateToString(
+                            day = mediaListEntry?.startedAt?.day,
+                            month = mediaListEntry?.startedAt?.month,
+                            year = mediaListEntry?.startedAt?.year
+                        ), onDateSelected = {
+                            mediaDetailsViewModel.setStartedAt(it)
+                        }
+                    )
+                    VerticalDivider()
+                    DateDisplay(
+                        modifier = Modifier.weight(1f),
+                        value = fuzzyDateToString(
+                            day = mediaListEntry?.completedAt?.day,
+                            month = mediaListEntry?.completedAt?.month,
+                            year = mediaListEntry?.completedAt?.year
+                        ), onDateSelected = {
+                            mediaDetailsViewModel.setCompletedAt(it)
+                        }
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp, vertical = 5.dp)
+                        .height(50.dp)
+                ) {
+                    ElevatedButton(
+                        enabled = isChanged || !isInLibrary,
+                        onClick = { mediaDetailsViewModel.saveMediaListEntry() },
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.elevatedButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Icon(Icons.Filled.Check, contentDescription = "Update")
+                            Text("Update")
+                        }
                     }
-                )
-                VerticalDivider()
-                DateDisplay(
-                    modifier = Modifier.weight(1f),
-                    value = fuzzyDateToString(
-                        day = mediaListEntry?.completedAt?.day,
-                        month = mediaListEntry?.completedAt?.month,
-                        year = mediaListEntry?.completedAt?.year
-                    ), onDateSelected = {
-                        mediaDetailsViewModel.setCompletedAt(it)
+                    Spacer(modifier = Modifier.width(10.dp))
+                    ElevatedButton(
+                        enabled = isInLibrary,
+                        onClick = { isConfirmationPopupVisible = true },
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.elevatedButtonColors(
+                            containerColor = MaterialTheme.colorScheme.error,
+                            contentColor = MaterialTheme.colorScheme.onError
+                        )
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Icon(Icons.Filled.Delete, contentDescription = "Delete")
+                            Text("Delete")
+                        }
                     }
-                )
+                }
             }
         }
+        ConfirmationPopup(
+            isVisible = isConfirmationPopupVisible,
+            onDismiss = { isConfirmationPopupVisible = false },
+            onConfirm = { mediaDetailsViewModel.deleteMediaListEntry() },
+        )
     }
 }
 
@@ -200,7 +261,7 @@ fun NumberDisplay(
         }
         IconButton(onClick = { if (maxValue == null || value < maxValue) onNumberSelected(value + 1) }) {
             Icon(
-                Icons.Filled.KeyboardArrowDown,
+                Icons.Filled.KeyboardArrowUp,
                 contentDescription = "Increase"
             )
         }
@@ -241,18 +302,18 @@ fun StatusDisplay(
                 tonalElevation = 4.dp
             ) {
                 Column {
-                    MediaListStatus.entries.forEach { option ->
-                        DropdownMenuItem(
-                            onClick = {
-                                onStatusSelected(option)
-                                expanded = false
-                            },
-                            text = { Text(option.toString()) }
-                        )
-                    }
+                    MediaListStatus.entries.filter { it != MediaListStatus.UNKNOWN__ }
+                        .forEach { option ->
+                            DropdownMenuItem(
+                                onClick = {
+                                    onStatusSelected(option)
+                                    expanded = false
+                                },
+                                text = { Text(reformatEnums(option.toString())) }
+                            )
+                        }
                 }
             }
         }
     }
-
 }

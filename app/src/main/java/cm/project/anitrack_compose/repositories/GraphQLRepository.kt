@@ -1,5 +1,6 @@
 package cm.project.anitrack_compose.repositories
 
+import cm.project.anitrack_compose.graphql.DeleteMediaListEntryMutation
 import cm.project.anitrack_compose.graphql.DiscoverMediaPageQuery
 import cm.project.anitrack_compose.graphql.GetAiringAnimeCalendarQuery
 import cm.project.anitrack_compose.graphql.GetMediaDetailsQuery
@@ -194,9 +195,9 @@ class GraphQLRepository @Inject constructor(private val apolloClient: ApolloClie
         progress: Int? = null,
         progressVolumes: Int? = null,
         status: MediaListStatus? = null
-    ): Result<Unit> {
+    ): Result<SaveMediaDetailsMutation.SaveMediaListEntry> {
         return try {
-            apolloClient.mutation(
+            val response = apolloClient.mutation(
                 SaveMediaDetailsMutation(
                     mediaId = Optional.present(mediaId),
                     mediaListEntryId = Optional.presentIfNotNull(mediaListEntryId),
@@ -220,7 +221,22 @@ class GraphQLRepository @Inject constructor(private val apolloClient: ApolloClie
                     status = Optional.presentIfNotNull(status)
                 )
             ).execute()
-            Result.Success(Unit)
+            Result.Success(response.data?.SaveMediaListEntry!!)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+
+    suspend fun deleteMediaListEntry(
+        mediaListEntryId: Int
+    ): Result<Boolean> {
+        return try {
+            val response = apolloClient.mutation(
+                DeleteMediaListEntryMutation(
+                    deleteMediaListEntryId = Optional.present(mediaListEntryId)
+                )
+            ).execute()
+            Result.Success(response.data?.DeleteMediaListEntry?.deleted!!)
         } catch (e: Exception) {
             Result.Error(e)
         }

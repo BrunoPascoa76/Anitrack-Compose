@@ -76,7 +76,6 @@ import cm.project.anitrack_compose.ui.components.LoadingScreen
 import cm.project.anitrack_compose.ui.components.MediaListEntryDisplay
 import cm.project.anitrack_compose.ui.components.RateLimitWarning
 import cm.project.anitrack_compose.viewModels.MediaDetailsViewModel
-import cm.project.anitrack_compose.viewModels.MediaListEntryInput
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.gowtham.ratingbar.RatingBar
@@ -88,7 +87,6 @@ fun MediaDetailsScreen(mediaId: Int, navController: NavController) {
     val media by mediaDetailsViewModel.media.collectAsState()
     val selectedTab by mediaDetailsViewModel.selectedTab.collectAsState()
     val isBeingRateLimited by mediaDetailsViewModel.isBeingRateLimited.collectAsState()
-    val mediaListEntry by mediaDetailsViewModel.mediaListEntry.collectAsState()
 
     val showMediaListEntryPopup by mediaDetailsViewModel.showMediaListEntryPopup.collectAsState()
 
@@ -103,7 +101,7 @@ fun MediaDetailsScreen(mediaId: Int, navController: NavController) {
         Scaffold { innerPadding ->
             Box(modifier = Modifier.padding(innerPadding)) {
                 Column {
-                    BannerComponent(navController, media!!.bannerImage, mediaListEntry)
+                    BannerComponent(navController, media!!.bannerImage)
                     BasicInfoComponent(media!!)
                     val tabs = listOf(
                         "Details",
@@ -163,10 +161,10 @@ fun MediaDetailsScreen(mediaId: Int, navController: NavController) {
 @Composable
 private fun BannerComponent(
     navController: NavController,
-    imageUrl: String?,
-    mediaListEntry: MediaListEntryInput?
+    imageUrl: String?
 ) {
     val mediaDetailsViewModel: MediaDetailsViewModel = hiltViewModel()
+    val isInLibrary by mediaDetailsViewModel.isInLibrary.collectAsState()
 
     val gradient = Brush.verticalGradient(
         colors = listOf(
@@ -205,7 +203,7 @@ private fun BannerComponent(
             }
             IconButton(onClick = { mediaDetailsViewModel.toggleMediaListEntryPopup() }) {
                 Icon(
-                    if (mediaListEntry == null) Icons.Outlined.BookmarkBorder else Icons.Filled.Bookmark,
+                    if (!isInLibrary) Icons.Outlined.BookmarkBorder else Icons.Filled.Bookmark,
                     contentDescription = null,
                     tint = Color.White
                 )
