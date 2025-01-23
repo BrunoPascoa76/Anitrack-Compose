@@ -15,7 +15,6 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,9 +26,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
-import cm.project.anitrack_compose.getSeason
-import cm.project.anitrack_compose.graphql.type.MediaSeason
-import cm.project.anitrack_compose.graphql.type.MediaSort
 import cm.project.anitrack_compose.ui.components.AnimeGridCard
 import cm.project.anitrack_compose.ui.components.BottomNavBar
 import cm.project.anitrack_compose.ui.components.RateLimitWarning
@@ -68,35 +64,29 @@ fun DiscoverScreen(navController: NavController) {
     ) { innerPadding ->
         when (selectedIndex) {
             0 -> DiscoverContent(
-                listOf(MediaSort.TRENDING_DESC),
                 modifier = Modifier.padding(innerPadding),
+                discoverViewModel = discoverViewModel,
                 navController = navController
             )
 
             1 -> DiscoverContent(
-                listOf(MediaSort.POPULARITY_DESC),
                 modifier = Modifier.padding(innerPadding),
+                discoverViewModel = discoverViewModel,
                 navController = navController
             )
 
             2 -> {
-                val (season, year) = getSeason(0)
                 DiscoverContent(
-                    listOf(MediaSort.POPULARITY_DESC),
                     modifier = Modifier.padding(innerPadding),
-                    season = season,
-                    year = year,
+                    discoverViewModel = discoverViewModel,
                     navController = navController
                 )
             }
 
             3 -> {
-                val (season, year) = getSeason(1)
                 DiscoverContent(
-                    listOf(MediaSort.POPULARITY_DESC),
                     modifier = Modifier.padding(innerPadding),
-                    season = season,
-                    year = year,
+                    discoverViewModel = discoverViewModel,
                     navController = navController
                 )
             }
@@ -106,21 +96,13 @@ fun DiscoverScreen(navController: NavController) {
 
 @Composable
 fun DiscoverContent(
-    sortCriteria: List<MediaSort>,
     modifier: Modifier = Modifier,
-    season: MediaSeason? = null,
-    year: Int? = null,
+    discoverViewModel: DiscoverViewModel = hiltViewModel(),
     navController: NavController
 ) {
-    val discoverViewModel = hiltViewModel<DiscoverViewModel>()
-
-    LaunchedEffect(Unit) {
-        discoverViewModel.updatePager(sortCriteria, season, year)
-    }
-
     var isRateLimited by remember { mutableStateOf(false) }
 
-    val lazyPagingItems = discoverViewModel.pager.collectAsLazyPagingItems()
+    val lazyPagingItems = discoverViewModel.getPagerForCurrentTab().collectAsLazyPagingItems()
 
     Box(modifier = modifier.padding(5.dp)) {
         LazyVerticalStaggeredGrid(

@@ -1,0 +1,17 @@
+mutation SaveMediaDetails($mediaId: Int, $mediaListEntryId: Int, $startedAt: FuzzyDateInput, $completedAt: FuzzyDateInput, $progress: Int, $progressVolumes: Int, $status: MediaListStatus, $score: Float) {
+    SaveMediaListEntry(mediaId: $mediaId, id: $mediaListEntryId, startedAt: $startedAt, completedAt: $completedAt, progress: $progress, progressVolumes: $progressVolumes, status: $status, score: $score) {
+        id
+        media {
+            id
+            episodes
+            title {
+                english
+                native
+                userPreferred
+            }
+        }
+        progress
+        progressVolumes
+        score(format: POINT_5)
+    }
+}

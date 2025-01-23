@@ -1,14 +1,18 @@
 package cm.project.anitrack_compose.repositories
 
+import cm.project.anitrack_compose.graphql.DeleteMediaListEntryMutation
 import cm.project.anitrack_compose.graphql.DiscoverMediaPageQuery
 import cm.project.anitrack_compose.graphql.GetAiringAnimeCalendarQuery
 import cm.project.anitrack_compose.graphql.GetMediaDetailsQuery
+import cm.project.anitrack_compose.graphql.GetMediaListEntryQuery
 import cm.project.anitrack_compose.graphql.GetMediaListQuery
 import cm.project.anitrack_compose.graphql.GetMediaListsQuery
 import cm.project.anitrack_compose.graphql.GetUserIdQuery
+import cm.project.anitrack_compose.graphql.SaveMediaDetailsMutation
 import cm.project.anitrack_compose.graphql.SearchMediaPageQuery
 import cm.project.anitrack_compose.graphql.UserProfilePictureQuery
 import cm.project.anitrack_compose.graphql.type.AiringSort
+import cm.project.anitrack_compose.graphql.type.FuzzyDateInput
 import cm.project.anitrack_compose.graphql.type.MediaListSort
 import cm.project.anitrack_compose.graphql.type.MediaListStatus
 import cm.project.anitrack_compose.graphql.type.MediaSeason
@@ -22,6 +26,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
+import java.time.LocalDate
 import javax.inject.Inject
 
 class GraphQLRepository @Inject constructor(private val apolloClient: ApolloClient) {
@@ -158,6 +163,80 @@ class GraphQLRepository @Inject constructor(private val apolloClient: ApolloClie
             ).execute()
             val pageData = response.data?.Page
             Result.Success(pageData!!)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+
+    suspend fun getMediaListEntry(
+        userId: Int,
+        mediaId: Int
+    ): Result<GetMediaListEntryQuery.MediaList?> {
+        return try {
+            val response = apolloClient.query(
+                GetMediaListEntryQuery(
+                    Optional.present(userId),
+                    Optional.present(mediaId)
+                )
+            ).execute()
+            val mediaList = response.data?.MediaList
+            Result.Success(mediaList)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+
+    suspend fun saveMediaListEntry(
+        mediaId: Int,
+        mediaListEntryId: Int? = null,
+        startedAt: LocalDate? = null,
+        completedAt: LocalDate? = null,
+        score: Double? = null,
+        progress: Int? = null,
+        progressVolumes: Int? = null,
+        status: MediaListStatus? = null
+    ): Result<SaveMediaDetailsMutation.SaveMediaListEntry> {
+        return try {
+            val response = apolloClient.mutation(
+                SaveMediaDetailsMutation(
+                    mediaId = Optional.present(mediaId),
+                    mediaListEntryId = Optional.presentIfNotNull(mediaListEntryId),
+                    startedAt = Optional.presentIfNotNull(
+                        FuzzyDateInput(
+                            Optional.presentIfNotNull(startedAt?.year),
+                            Optional.presentIfNotNull(startedAt?.monthValue),
+                            Optional.presentIfNotNull(startedAt?.dayOfMonth)
+                        )
+                    ),
+                    completedAt = Optional.presentIfNotNull(
+                        FuzzyDateInput(
+                            Optional.presentIfNotNull(completedAt?.year),
+                            Optional.presentIfNotNull(completedAt?.monthValue),
+                            Optional.presentIfNotNull(completedAt?.dayOfMonth)
+                        ),
+                    ),
+                    score = Optional.presentIfNotNull(score),
+                    progress = Optional.presentIfNotNull(progress),
+                    progressVolumes = Optional.presentIfNotNull(progressVolumes),
+                    status = Optional.presentIfNotNull(status)
+                )
+            ).execute()
+            Result.Success(response.data?.SaveMediaListEntry!!)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+
+    suspend fun deleteMediaListEntry(
+        mediaListEntryId: Int
+    ): Result<Boolean> {
+        return try {
+            val response = apolloClient.mutation(
+                DeleteMediaListEntryMutation(
+                    deleteMediaListEntryId = Optional.present(mediaListEntryId)
+                )
+            ).execute()
+            Result.Success(response.data?.DeleteMediaListEntry?.deleted!!)
         } catch (e: Exception) {
             Result.Error(e)
         }

@@ -3,7 +3,9 @@ package cm.project.anitrack_compose.ui
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -30,7 +32,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Label
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Sell
+import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.PlayCircle
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
@@ -61,6 +65,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import cm.project.anitrack_compose.fuzzyDateToString
@@ -68,6 +73,7 @@ import cm.project.anitrack_compose.graphql.GetMediaDetailsQuery
 import cm.project.anitrack_compose.graphql.type.CharacterRole
 import cm.project.anitrack_compose.ui.components.AnimeGridCard
 import cm.project.anitrack_compose.ui.components.LoadingScreen
+import cm.project.anitrack_compose.ui.components.MediaListEntryDisplay
 import cm.project.anitrack_compose.ui.components.RateLimitWarning
 import cm.project.anitrack_compose.viewModels.MediaDetailsViewModel
 import coil.compose.AsyncImage
@@ -75,7 +81,6 @@ import coil.request.ImageRequest
 import com.gowtham.ratingbar.RatingBar
 import com.gowtham.ratingbar.RatingBarStyle
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MediaDetailsScreen(mediaId: Int, navController: NavController) {
     val mediaDetailsViewModel: MediaDetailsViewModel = hiltViewModel()
@@ -83,9 +88,14 @@ fun MediaDetailsScreen(mediaId: Int, navController: NavController) {
     val selectedTab by mediaDetailsViewModel.selectedTab.collectAsState()
     val isBeingRateLimited by mediaDetailsViewModel.isBeingRateLimited.collectAsState()
 
+    val showMediaListEntryPopup by mediaDetailsViewModel.showMediaListEntryPopup.collectAsState()
+
     LaunchedEffect(Unit) {
         mediaDetailsViewModel.getMediaDetails(mediaId)
     }
+
+    if (media != null) mediaDetailsViewModel.getMediaListEntry()
+
 
     if (media != null) {
         Scaffold { innerPadding ->
@@ -125,6 +135,21 @@ fun MediaDetailsScreen(mediaId: Int, navController: NavController) {
                 RateLimitWarning(isBeingRateLimited)
             }
         }
+        AnimatedVisibility(
+            visible = showMediaListEntryPopup,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Dialog(
+                onDismissRequest = { mediaDetailsViewModel.toggleMediaListEntryPopup() }
+            ) {
+                MediaListEntryDisplay(
+                    mediaDetailsViewModel = mediaDetailsViewModel,
+                    onDismiss = { mediaDetailsViewModel.toggleMediaListEntryPopup() },
+                    episodes = media!!.episodes
+                )
+            }
+        }
     } else {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             LoadingScreen()
@@ -134,7 +159,13 @@ fun MediaDetailsScreen(mediaId: Int, navController: NavController) {
 }
 
 @Composable
-private fun BannerComponent(navController: NavController, imageUrl: String?) {
+private fun BannerComponent(
+    navController: NavController,
+    imageUrl: String?
+) {
+    val mediaDetailsViewModel: MediaDetailsViewModel = hiltViewModel()
+    val isInLibrary by mediaDetailsViewModel.isInLibrary.collectAsState()
+
     val gradient = Brush.verticalGradient(
         colors = listOf(
             Color.Black.copy(alpha = 0.5f),
@@ -166,6 +197,13 @@ private fun BannerComponent(navController: NavController, imageUrl: String?) {
             IconButton(onClick = { navController.navigateUp() }) {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = null,
+                    tint = Color.White
+                )
+            }
+            IconButton(onClick = { mediaDetailsViewModel.toggleMediaListEntryPopup() }) {
+                Icon(
+                    if (!isInLibrary) Icons.Outlined.BookmarkBorder else Icons.Filled.Bookmark,
                     contentDescription = null,
                     tint = Color.White
                 )

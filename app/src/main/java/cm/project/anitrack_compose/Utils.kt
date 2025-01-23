@@ -19,3 +19,7 @@ fun getSeason(seasonsFromNow: Int): Pair<MediaSeason, Int> {
         else -> throw Exception("You somehow broke math, congrats")
     }
 }
+
+fun reformatEnums(enum: String): String {
+    return enum.lowercase().replaceFirstChar { it.uppercase() }.replace("_", " ")
+}
