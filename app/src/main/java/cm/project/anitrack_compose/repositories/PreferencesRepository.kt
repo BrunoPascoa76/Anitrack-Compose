@@ -57,14 +57,14 @@ class PreferencesRepository @Inject constructor(@ApplicationContext private val 
 
     suspend fun saveAccessToken(
         accessToken: String,
-        expiresIn: Long = (365L * 24 * 60 * 60 * 1000)
+        expiresIn: Long = (365L * 24 * 60 * 60)
     ) {
         context.dataStore.edit { preferences ->
             preferences[ACCESS_TOKEN] = accessToken
         }
         context.dataStore.edit { preferences ->
             preferences[ACCESS_TOKEN_EXPIRATION] =
-                System.currentTimeMillis() + expiresIn
+                System.currentTimeMillis() + (expiresIn * 1000) - 360_000 // minus 1h so that it doesn't expire mid-session
         }
     }
 
