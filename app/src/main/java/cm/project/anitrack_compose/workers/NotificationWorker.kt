@@ -11,7 +11,9 @@ import com.kdroid.composenotification.builder.ExperimentalNotificationsApi
 import com.kdroid.composenotification.builder.Notification
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.withContext
 import kotlin.Exception
 import kotlin.OptIn
 import kotlin.String
@@ -28,25 +30,27 @@ class NotificationWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         return try {
-            preferencesRepository.cleanupExpiredAccessToken()
+            withContext(Dispatchers.Main) {
+                preferencesRepository.cleanupExpiredAccessToken()
 
-            val accessToken = preferencesRepository.accessToken.firstOrNull()
+                val accessToken = preferencesRepository.accessToken.firstOrNull()
 
-            if (accessToken == null) {
-                Result.failure()
-            }
-
-            when (val result = graphQLRepository.getNotifications()) {
-                is Result_.Success -> {
-                    if (result.data.isNotEmpty()) {
-                        sendNotification(result.data)
-                    }
+                if (accessToken == null) {
+                    Result.failure()
                 }
 
-                is Result_.Error -> {}
-            }
+                when (val result = graphQLRepository.getNotifications()) {
+                    is Result_.Success -> {
+                        if (result.data.isNotEmpty()) {
+                            sendNotification(result.data)
+                        }
+                    }
 
-            Result.success()
+                    is Result_.Error -> {}
+                }
+
+                Result.success()
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             Result.failure()
@@ -77,8 +81,10 @@ class NotificationWorker @AssistedInject constructor(
                 val title =
                     media?.title?.english ?: media?.title?.native ?: media?.title?.userPreferred
                     ?: ""
-                if (episode <= 1) {
-                    return "<b>$title</b> has just premiered!"
+                return if (episode <= 1) {
+                    "$title has just premiered!"
+                } else {
+                    "episode $episode of $title has just aired!"
                 }
             }
 
@@ -87,7 +93,7 @@ class NotificationWorker @AssistedInject constructor(
                 val title =
                     media?.title?.english ?: media?.title?.native ?: media?.title?.userPreferred
                     ?: ""
-                return "<b>$title</b> has been added to the database!"
+                return "$title has been added to the database!"
             }
 
             "MediaDataChangeNotification" -> {
@@ -95,13 +101,12 @@ class NotificationWorker @AssistedInject constructor(
                 val title =
                     media?.title?.english ?: media?.title?.native ?: media?.title?.userPreferred
                     ?: ""
-                return "<b>$title</b> has suffered data changes!"
+                return "$title has suffered data changes!"
             }
 
             else -> {
                 return "Unknown notification type"
             }
         }
-        return ""
     }
 }
