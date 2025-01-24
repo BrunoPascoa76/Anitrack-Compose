@@ -1,0 +1,41 @@
+query GetNotifications($page: Int){
+    Page(page: $page, perPage: 25) {
+        notifications(type_in: [AIRING,MEDIA_DATA_CHANGE,RELATED_MEDIA_ADDITION]) {
+            ... on AiringNotification {
+                episode
+                media {
+                    title {
+                        english
+                        native
+                        userPreferred
+                    }
+                }
+                type
+            }
+            ... on RelatedMediaAdditionNotification {
+                media {
+                    title {
+                        english
+                        native
+                        userPreferred
+                    }
+                }
+                type
+            }
+            ... on MediaDataChangeNotification {
+                media {
+                    id
+                    title {
+                        english
+                        native
+                        userPreferred
+                    }
+                }
+                type
+            }
+        }
+    }
+    Viewer {
+        unreadNotificationCount
+    }
+}

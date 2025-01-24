@@ -7,6 +7,7 @@ import cm.project.anitrack_compose.graphql.GetMediaDetailsQuery
 import cm.project.anitrack_compose.graphql.GetMediaListEntryQuery
 import cm.project.anitrack_compose.graphql.GetMediaListQuery
 import cm.project.anitrack_compose.graphql.GetMediaListsQuery
+import cm.project.anitrack_compose.graphql.GetNotificationsQuery
 import cm.project.anitrack_compose.graphql.GetUserIdQuery
 import cm.project.anitrack_compose.graphql.SaveMediaDetailsMutation
 import cm.project.anitrack_compose.graphql.SearchMediaPageQuery
@@ -237,6 +238,19 @@ class GraphQLRepository @Inject constructor(private val apolloClient: ApolloClie
                 )
             ).execute()
             Result.Success(response.data?.DeleteMediaListEntry?.deleted!!)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+
+    suspend fun getNotifications(page: Int = 1): Result<List<GetNotificationsQuery.Notification>> {
+        return try {
+            val response = apolloClient.query(
+                GetNotificationsQuery(Optional.present(page))
+            ).execute()
+            val notifications = response.data?.Page?.notifications
+            val unreadNotificationCount = response.data?.Viewer?.unreadNotificationCount
+            Result.Success(notifications!!.mapNotNull { it }.take(unreadNotificationCount!!))
         } catch (e: Exception) {
             Result.Error(e)
         }

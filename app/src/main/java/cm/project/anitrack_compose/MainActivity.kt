@@ -1,5 +1,7 @@
 package cm.project.anitrack_compose
 
+import android.R
+import android.app.NotificationManager
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -16,6 +18,10 @@ import cm.project.anitrack_compose.ui.navigation.AppNavHost
 import cm.project.anitrack_compose.ui.theme.AnitrackComposeTheme
 import cm.project.anitrack_compose.viewModels.OAuthViewModel
 import cm.project.anitrack_compose.viewModels.PreferencesViewModel
+import com.kdroid.composenotification.builder.AndroidChannelConfig
+import com.kdroid.composenotification.builder.ExperimentalNotificationsApi
+import com.kdroid.composenotification.builder.NotificationInitializer.notificationInitializer
+import com.kdroid.composenotification.builder.getNotificationProvider
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -25,12 +31,35 @@ class MainActivity : ComponentActivity() {
     private val preferencesViewModel by viewModels<PreferencesViewModel>()
     private val oAuthViewModel by viewModels<OAuthViewModel>()
 
+    @OptIn(ExperimentalNotificationsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        var initialRoute: String? by mutableStateOf(null)
+        notificationInitializer(
+            defaultChannelConfig = AndroidChannelConfig(
+                channelId = "my_channel_id",
+                channelName = "My Channel Name",
+                channelDescription = "My Channel Description",
+                channelImportance = NotificationManager.IMPORTANCE_DEFAULT,
+                smallIcon = R.drawable.ic_notification_overlay
+            )
+        )
+        val notificationProvider = getNotificationProvider()
+        val hasPermission by notificationProvider.hasPermissionState
+        if (!hasPermission) {
+            notificationProvider.requestPermission(
+                onGranted = {
+                    notificationProvider.updatePermissionState(true)
+                },
+                onDenied = {
+                    notificationProvider.updatePermissionState(false)
+                }
+            )
+        }
 
+
+        var initialRoute: String? by mutableStateOf(null)
         lifecycleScope.launch {
             val clientId = preferencesViewModel.clientId.firstOrNull()
             val clientSecret = preferencesViewModel.clientSecret.firstOrNull()

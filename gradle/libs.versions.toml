@@ -5,6 +5,7 @@ apolloRuntime = "3.8.5"
 appauth = "0.11.1"
 coilCompose = "2.4.0"
 composecalendar = "1.1.0"
+composeNativeNotification = "0.2.0"
 composeRatingbar = "1.3.12"
 composeWheelPicker = "version"
 composeWheelPickerVersion = "Tag"
@@ -15,6 +16,7 @@ hiltAndroid = "2.50"
 hiltAndroidVersion = "2.50"
 hiltCompiler = "2.50"
 hiltNavigationCompose = "1.2.0"
+hiltWork = "<latest_version>"
 kotlin = "1.9.0"
 coreKtx = "1.15.0"
 junit = "4.13.2"
@@ -31,22 +33,28 @@ pagingCommonAndroid = "3.3.5"
 pagingCompose = "3.3.5"
 pagingRuntimeKtx = "3.3.5"
 uiTestAndroid = "1.7.6"
+workRuntimeKtx = "<latest_version>"
+hiltCommon = "1.2.0"
+workRuntimeKtxVersion = "2.10.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+androidx-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hiltWork" }
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "pagingCompose" }
 androidx-paging-runtime-ktx = { module = "androidx.paging:paging-runtime-ktx", version.ref = "pagingRuntimeKtx" }
+androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 apollo-api = { module = "com.apollographql.apollo3:apollo-api", version.ref = "apolloRuntime" }
 apollo-http-cache = { module = "com.apollographql.apollo3:apollo-http-cache", version.ref = "apolloNormalizedCache" }
 apollo-normalized-cache = { module = "com.apollographql.apollo3:apollo-normalized-cache", version.ref = "apolloNormalizedCache" }
 apollo-runtime = { module = "com.apollographql.apollo3:apollo-runtime", version.ref = "apolloRuntime" }
 appauth = { module = "net.openid:appauth", version.ref = "appauth" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
+compose-native-notification = { module = "io.github.kdroidfilter:compose-native-notification", version.ref = "composeNativeNotification" }
 compose-ratingbar = { module = "com.github.a914-gowtham:compose-ratingbar", version.ref = "composeRatingbar" }
 compose-wheel-picker = { module = "com.github.your-library:compose-wheel-picker", version.ref = "composeWheelPicker" }
 compose-wheel-picker-v100rc02 = { module = "com.github.zj565061763:compose-wheel-picker", version.ref = "githubComposeWheelPickerVersion" }
@@ -73,6 +81,8 @@ kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutine
 androidx-paging-common-android = { group = "androidx.paging", name = "paging-common-android", version.ref = "pagingCommonAndroid" }
 androidx-ui-test-android = { group = "androidx.compose.ui", name = "ui-test-android", version.ref = "uiTestAndroid" }
 zj565061763-compose-wheel-picker = { module = "com.github.zj565061763:compose-wheel-picker", version.ref = "composeWheelPickerVersion" }
+androidx-hilt-common = { group = "androidx.hilt", name = "hilt-common", version.ref = "hiltCommon" }
+work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtxVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
