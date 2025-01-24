@@ -1,6 +1,9 @@
 package cm.project.anitrack_compose.di
 
 import android.content.Context
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
+import androidx.work.WorkManager
 import cm.project.anitrack_compose.repositories.AuthorizationInterceptor
 import cm.project.anitrack_compose.repositories.GraphQLRepository
 import cm.project.anitrack_compose.repositories.PreferencesRepository
@@ -47,5 +50,18 @@ object AppModule {
             .serverUrl("https://graphql.anilist.co")
             .okHttpClient(okHttpClient)
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideWorkManager(
+        @ApplicationContext context: Context,
+        workerFactory: HiltWorkerFactory
+    ): WorkManager {
+        val configuration = Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
+        WorkManager.initialize(context, configuration)
+        return WorkManager.getInstance(context)
     }
 }

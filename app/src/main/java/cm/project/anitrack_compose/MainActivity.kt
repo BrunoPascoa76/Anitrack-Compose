@@ -18,6 +18,7 @@ import cm.project.anitrack_compose.ui.navigation.AppNavHost
 import cm.project.anitrack_compose.ui.theme.AnitrackComposeTheme
 import cm.project.anitrack_compose.viewModels.OAuthViewModel
 import cm.project.anitrack_compose.viewModels.PreferencesViewModel
+import cm.project.anitrack_compose.workers.WorkerHelper
 import com.kdroid.composenotification.builder.AndroidChannelConfig
 import com.kdroid.composenotification.builder.ExperimentalNotificationsApi
 import com.kdroid.composenotification.builder.NotificationInitializer.notificationInitializer
@@ -25,11 +26,15 @@ import com.kdroid.composenotification.builder.getNotificationProvider
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val preferencesViewModel by viewModels<PreferencesViewModel>()
     private val oAuthViewModel by viewModels<OAuthViewModel>()
+
+    @Inject
+    lateinit var workerHelper: WorkerHelper
 
     @OptIn(ExperimentalNotificationsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,6 +83,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AnitrackComposeTheme {
                 if (initialRoute != null) {
+                    workerHelper.scheduleNotificationWorker()
                     AppNavHost(
                         preferencesViewModel,
                         navController = rememberNavController(),

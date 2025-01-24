@@ -1,4 +1,4 @@
-package cm.project.anitrack_compose.viewModels
+package cm.project.anitrack_compose.workers
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
@@ -9,7 +9,6 @@ import cm.project.anitrack_compose.repositories.GraphQLRepository
 import cm.project.anitrack_compose.repositories.PreferencesRepository
 import com.kdroid.composenotification.builder.ExperimentalNotificationsApi
 import com.kdroid.composenotification.builder.Notification
-import com.kdroid.composenotification.builder.NotificationProvider
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.firstOrNull
@@ -18,11 +17,11 @@ import kotlin.OptIn
 import kotlin.String
 import cm.project.anitrack_compose.repositories.Result as Result_
 
+
 @HiltWorker
 class NotificationWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val notificationProvider: NotificationProvider,
     private val preferencesRepository: PreferencesRepository,
     private val graphQLRepository: GraphQLRepository
 ) : CoroutineWorker(context, workerParams) {
@@ -40,7 +39,7 @@ class NotificationWorker @AssistedInject constructor(
             when (val result = graphQLRepository.getNotifications()) {
                 is Result_.Success -> {
                     if (result.data.isNotEmpty()) {
-
+                        sendNotification(result.data)
                     }
                 }
 
@@ -49,6 +48,7 @@ class NotificationWorker @AssistedInject constructor(
 
             Result.success()
         } catch (e: Exception) {
+            e.printStackTrace()
             Result.failure()
         }
     }
@@ -56,15 +56,14 @@ class NotificationWorker @AssistedInject constructor(
 
     @OptIn(ExperimentalNotificationsApi::class)
     private fun sendNotification(
-        notifications: List<GetNotificationsQuery.Notification>,
-        notificationProvider: NotificationProvider
+        notifications: List<GetNotificationsQuery.Notification>
     ) {
         val stringBuilder = StringBuilder()
         for (notification in notifications) {
             stringBuilder.appendLine(notificationToText(notification))
         }
 
-        val notification = Notification(
+        Notification(
             title = "${notifications.size} new notifications",
             message = stringBuilder.toString(),
         )

@@ -94,7 +94,14 @@ dependencies {
     implementation(libs.compose.wheel.picker.v100rc02)
     implementation(libs.composecalendar)
     implementation(libs.compose.native.notification)
+    implementation("androidx.hilt:hilt-work:1.0.0")
+    kapt("androidx.hilt:hilt-compiler:1.0.0")
 }
+
+kapt {
+    correctErrorTypes = true
+}
+
 
 apollo {
     service("anilist") {
