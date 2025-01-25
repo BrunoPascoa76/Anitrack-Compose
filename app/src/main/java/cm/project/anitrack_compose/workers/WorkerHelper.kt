@@ -30,7 +30,7 @@ class WorkerHelper @Inject constructor(private val workManager: WorkManager) {
 
         workManager.enqueueUniquePeriodicWork(
             "notificationWorker",
-            ExistingPeriodicWorkPolicy.KEEP,
+            ExistingPeriodicWorkPolicy.UPDATE,
             periodicWorkRequest.build()
         )
     }

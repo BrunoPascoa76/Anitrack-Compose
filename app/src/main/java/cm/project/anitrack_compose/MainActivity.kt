@@ -1,6 +1,5 @@
 package cm.project.anitrack_compose
 
-import android.R
 import android.app.NotificationManager
 import android.content.Intent
 import android.os.Bundle
@@ -43,11 +42,11 @@ class MainActivity : ComponentActivity() {
 
         notificationInitializer(
             defaultChannelConfig = AndroidChannelConfig(
-                channelId = "my_channel_id",
-                channelName = "My Channel Name",
+                channelId = "media_notification",
+                channelName = "Anilist Media notifications",
                 channelDescription = "My Channel Description",
                 channelImportance = NotificationManager.IMPORTANCE_DEFAULT,
-                smallIcon = R.drawable.ic_notification_overlay
+                smallIcon = R.drawable.white_notification_icon
             )
         )
         val notificationProvider = getNotificationProvider()

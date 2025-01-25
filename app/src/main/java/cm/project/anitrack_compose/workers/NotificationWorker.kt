@@ -1,14 +1,18 @@
 package cm.project.anitrack_compose.workers
 
+import android.app.NotificationManager
 import android.content.Context
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
+import androidx.core.text.HtmlCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import cm.project.anitrack_compose.R
 import cm.project.anitrack_compose.graphql.GetNotificationsQuery
 import cm.project.anitrack_compose.repositories.GraphQLRepository
 import cm.project.anitrack_compose.repositories.PreferencesRepository
 import com.kdroid.composenotification.builder.ExperimentalNotificationsApi
-import com.kdroid.composenotification.builder.Notification
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +26,7 @@ import cm.project.anitrack_compose.repositories.Result as Result_
 
 @HiltWorker
 class NotificationWorker @AssistedInject constructor(
-    @Assisted context: Context,
+    @Assisted private val context: Context,
     @Assisted workerParams: WorkerParameters,
     private val preferencesRepository: PreferencesRepository,
     private val graphQLRepository: GraphQLRepository
@@ -65,12 +69,29 @@ class NotificationWorker @AssistedInject constructor(
         val stringBuilder = StringBuilder()
         for (notification in notifications) {
             stringBuilder.appendLine(notificationToText(notification))
+            stringBuilder.appendLine()
         }
 
-        Notification(
-            title = "${notifications.size} new notifications",
-            message = stringBuilder.toString(),
+        val bigTextStyle = NotificationCompat.BigTextStyle().bigText(
+            HtmlCompat.fromHtml(
+                stringBuilder.toString(),
+                HtmlCompat.FROM_HTML_MODE_LEGACY
+            )
         )
+
+        val builder = NotificationCompat.Builder(applicationContext, "media_notification")
+            .setContentTitle(if (notifications.size == 1) "1 new notification" else "${notifications.size} new notifications")
+            .setContentText(stringBuilder.toString().stripBoldTags())
+            .setSmallIcon(R.drawable.white_notification_icon)
+            .setStyle(bigTextStyle)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+
+        val notificationManager = ContextCompat.getSystemService(
+            context,
+            NotificationManager::class.java
+        ) as NotificationManager
+
+        notificationManager.notify(1, builder.build())
     }
 
     private fun notificationToText(notification: GetNotificationsQuery.Notification): String {
@@ -82,9 +103,9 @@ class NotificationWorker @AssistedInject constructor(
                     media?.title?.english ?: media?.title?.native ?: media?.title?.userPreferred
                     ?: ""
                 return if (episode <= 1) {
-                    "$title has just premiered!"
+                    "$title has just premiered!<br>"
                 } else {
-                    "episode $episode of $title has just aired!"
+                    "Episode $episode of <b>$title</b> has just aired!<br>"
                 }
             }
 
@@ -93,7 +114,7 @@ class NotificationWorker @AssistedInject constructor(
                 val title =
                     media?.title?.english ?: media?.title?.native ?: media?.title?.userPreferred
                     ?: ""
-                return "$title has been added to the database!"
+                return "<b>$title</b> has been added to the database!<br>"
             }
 
             "MediaDataChangeNotification" -> {
@@ -101,12 +122,16 @@ class NotificationWorker @AssistedInject constructor(
                 val title =
                     media?.title?.english ?: media?.title?.native ?: media?.title?.userPreferred
                     ?: ""
-                return "$title has suffered data changes!"
+                return "<b>$title</b> has suffered data changes!<br>"
             }
 
             else -> {
-                return "Unknown notification type"
+                return "Unknown notification type<br>"
             }
         }
     }
+}
+
+fun String.stripBoldTags(): String {
+    return this.replace("(</?b>)|(<br>)".toRegex(), "")
 }
