@@ -131,6 +131,7 @@ class MediaDetailsViewModel @Inject constructor(private val graphQLRepository: G
     }
 
     fun setProgress(progress: Int) {
+        _isChanged.value = true
         if (_media.value?.episodes != null && progress >= _media.value?.episodes!!) {
             _mediaListEntry.value = _mediaListEntry.value?.copy(
                 progress = _media.value?.episodes,
@@ -200,18 +201,20 @@ class MediaDetailsViewModel @Inject constructor(private val graphQLRepository: G
                 mediaId = _media.value!!.id,
                 mediaListEntryId = _mediaListEntry.value!!.mediaListEntryId,
                 startedAt = _mediaListEntry.value!!.startedAt?.let {
-                    LocalDate.of(
-                        it.year!!,
-                        it.month!!,
-                        it.day!!
-                    )
+                    if (it.year != null && it.month != null && it.day != null)
+                        LocalDate.of(
+                            it.year,
+                            it.month,
+                            it.day
+                        ) else null
                 },
                 completedAt = _mediaListEntry.value!!.completedAt?.let {
-                    LocalDate.of(
-                        it.year!!,
-                        it.month!!,
-                        it.day!!
-                    )
+                    if (it.year != null && it.month != null && it.day != null)
+                        LocalDate.of(
+                            it.year,
+                            it.month,
+                            it.day
+                        ) else null
                 },
                 score = _mediaListEntry.value!!.score?.toDouble(),
                 progress = _mediaListEntry.value!!.progress,
