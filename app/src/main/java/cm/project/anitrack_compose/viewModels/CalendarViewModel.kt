@@ -32,6 +32,9 @@ class CalendarViewModel @Inject constructor(
     private var _isRefreshing = false
     private var refreshJob: Job? = null
 
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading = _isLoading.asStateFlow()
+
     val calendarFilterWatchlist = preferencesRepository.calendarFilterWatchlist
     private val _selectedIndex = MutableStateFlow(0)
     val selectedIndex = _selectedIndex.asStateFlow()
@@ -57,6 +60,7 @@ class CalendarViewModel @Inject constructor(
     }
 
     private suspend fun refresh() {
+        _isLoading.value = true
         if (_userId == null) {
             when (val result = graphQLRepository.getUserId()) {
                 is Result.Success -> {
@@ -64,6 +68,7 @@ class CalendarViewModel @Inject constructor(
                 }
 
                 is Result.Error -> {
+                    _isLoading.value = false
                     return
                 }
             }
@@ -77,7 +82,9 @@ class CalendarViewModel @Inject constructor(
                     processAiringWatchlist(result.data)
                 }
 
-                is Result.Error -> {}
+                is Result.Error -> {
+                    _isLoading.value = false
+                }
             }
         }
         when (val result = graphQLRepository.getAiringAnimeCalendar(
@@ -90,9 +97,12 @@ class CalendarViewModel @Inject constructor(
         )) {
             is Result.Success -> {
                 _calendar.value = result.data.airingSchedules ?: emptyList()
+                _isLoading.value = false
             }
 
-            is Result.Error -> {}
+            is Result.Error -> {
+                _isLoading.value = false
+            }
         }
     }
 
