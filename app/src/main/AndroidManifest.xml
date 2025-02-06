@@ -38,7 +38,7 @@
 
                 <data
                     android:scheme="myapp"
-                    android:host="notififcationRoute" />
+                    android:host="notificationroute" />
             </intent-filter>
         </activity>
 

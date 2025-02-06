@@ -103,6 +103,7 @@ class NotificationWorker @AssistedInject constructor(
             .setStyle(bigTextStyle)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(deepLinkPendingIntent)
+            .setAutoCancel(true)
 
         val notificationManager = ContextCompat.getSystemService(
             context,

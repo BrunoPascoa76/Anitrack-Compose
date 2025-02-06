@@ -5,6 +5,9 @@ query GetNotifications($page: Int){
                 episode
                 media {
                     id
+                    coverImage {
+                        large
+                    }
                     title {
                         english
                         native
@@ -16,6 +19,9 @@ query GetNotifications($page: Int){
             ... on RelatedMediaAdditionNotification {
                 media {
                     id
+                    coverImage {
+                        large
+                    }
                     title {
                         english
                         native
@@ -27,6 +33,9 @@ query GetNotifications($page: Int){
             ... on MediaDataChangeNotification {
                 media {
                     id
+                    coverImage {
+                        large
+                    }
                     title {
                         english
                         native

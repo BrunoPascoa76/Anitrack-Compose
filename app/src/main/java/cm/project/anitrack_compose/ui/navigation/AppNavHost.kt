@@ -66,7 +66,7 @@ fun AppNavHost(
 
         composable(
             route = "notifications",
-            deepLinks = listOf(navDeepLink { uriPattern = "myapp://notificationRoute" })
+            deepLinks = listOf(navDeepLink { uriPattern = "myapp://notificationroute" })
         ) {
             GraphQLWrapper(preferencesViewModel) {
                 NotificationScreen(navController = navController)
