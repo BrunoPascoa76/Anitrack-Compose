@@ -4,6 +4,7 @@ query GetNotifications($page: Int){
             ... on AiringNotification {
                 episode
                 media {
+                    id
                     title {
                         english
                         native
@@ -14,6 +15,7 @@ query GetNotifications($page: Int){
             }
             ... on RelatedMediaAdditionNotification {
                 media {
+                    id
                     title {
                         english
                         native
@@ -33,6 +35,11 @@ query GetNotifications($page: Int){
                 }
                 type
             }
+        }
+        pageInfo {
+            hasNextPage
+            currentPage
+            lastPage
         }
     }
 }

@@ -244,7 +244,7 @@ class GraphQLRepository @Inject constructor(private val apolloClient: ApolloClie
         }
     }
 
-    suspend fun getNotifications(page: Int = 1): Result<List<GetNotificationsQuery.Notification>> {
+    suspend fun getUnreadNotifications(page: Int = 1): Result<List<GetNotificationsQuery.Notification>> {
         return try {
             val unreadNotificationCount = apolloClient.query(
                 GetUnreadNotificationCountQuery()
@@ -257,6 +257,30 @@ class GraphQLRepository @Inject constructor(private val apolloClient: ApolloClie
             val notifications = response.data?.Page?.notifications
 
             Result.Success(notifications!!.mapNotNull { it }.take(unreadNotificationCount!!))
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+
+    suspend fun getUnreadNotificationCount(): Result<Int> {
+        return try {
+            val response = apolloClient.query(
+                GetUnreadNotificationCountQuery()
+            ).execute()
+            val unreadNotificationCount = response.data?.Viewer?.unreadNotificationCount
+            Result.Success(unreadNotificationCount!!)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+
+    suspend fun getNotifications(page: Int = 1): Result<GetNotificationsQuery.Page> {
+        return try {
+            val response = apolloClient.query(
+                GetNotificationsQuery(Optional.present(page))
+            ).execute()
+            val notifications = response.data?.Page
+            Result.Success(notifications!!)
         } catch (e: Exception) {
             Result.Error(e)
         }

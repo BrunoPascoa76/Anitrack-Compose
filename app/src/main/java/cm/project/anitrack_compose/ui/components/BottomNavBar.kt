@@ -52,14 +52,14 @@ fun BottomNavBar(navController: NavController) {
                 if (currentRoute != "explore") navController.navigate("explore")
             }
         )
-//        NavigationBarItem(
-//            icon = { ProfileIcon() },
-//            label = { Text("Profile") },
-//            selected = currentRoute == "profile",
-//            onClick = {
-//                if (currentRoute != "profile") navController.navigate("profile")
-//            }
-//        )
+        NavigationBarItem(
+            icon = { ProfileIcon() },
+            label = { Text("Profile") },
+            selected = currentRoute == "profile",
+            onClick = {
+                if (currentRoute != "profile") navController.navigate("profile")
+            }
+        )
     }
 }
 

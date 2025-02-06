@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -64,6 +65,7 @@ class MainActivity : ComponentActivity() {
 
 
         var initialRoute: String? by mutableStateOf(null)
+        val notificationDestination = intent.getStringExtra("DESTINATION")
         lifecycleScope.launch {
             val clientId = preferencesViewModel.clientId.firstOrNull()
             val clientSecret = preferencesViewModel.clientSecret.firstOrNull()
@@ -75,17 +77,28 @@ class MainActivity : ComponentActivity() {
                     oAuthViewModel.startAuth(clientId)
                 }
             }
-            initialRoute =
-                if (clientId != null && clientSecret != null) "watchlist" else "apiSetup"
+            initialRoute = when {
+                notificationDestination != null -> notificationDestination
+                clientId != null && clientSecret != null -> "watchlist"
+                else -> "apiSetup"
+            }
         }
 
         setContent {
             AnitrackComposeTheme {
                 if (initialRoute != null) {
                     workerHelper.scheduleNotificationWorker()
+                    val navController = rememberNavController()
+
+                    LaunchedEffect(notificationDestination) {
+                        if (notificationDestination != null) {
+                            navController.navigate(notificationDestination)
+                        }
+                    }
+
                     AppNavHost(
                         preferencesViewModel,
-                        navController = rememberNavController(),
+                        navController = navController,
                         startDestination = initialRoute!!
                     )
                 } else {

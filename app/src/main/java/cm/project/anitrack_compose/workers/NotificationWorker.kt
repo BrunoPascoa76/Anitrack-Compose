@@ -1,26 +1,30 @@
 package cm.project.anitrack_compose.workers
 
 import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.TaskStackBuilder
 import android.content.Context
+import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import cm.project.anitrack_compose.MainActivity
 import cm.project.anitrack_compose.R
 import cm.project.anitrack_compose.graphql.GetNotificationsQuery
 import cm.project.anitrack_compose.repositories.GraphQLRepository
 import cm.project.anitrack_compose.repositories.PreferencesRepository
-import com.kdroid.composenotification.builder.ExperimentalNotificationsApi
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import kotlin.Exception
-import kotlin.OptIn
 import kotlin.String
+import kotlin.run
 import cm.project.anitrack_compose.repositories.Result as Result_
 
 
@@ -43,7 +47,7 @@ class NotificationWorker @AssistedInject constructor(
                     Result.failure()
                 }
 
-                when (val result = graphQLRepository.getNotifications()) {
+                when (val result = graphQLRepository.getUnreadNotifications()) {
                     is Result_.Success -> {
                         if (result.data.isNotEmpty()) {
                             sendNotification(result.data)
@@ -62,10 +66,23 @@ class NotificationWorker @AssistedInject constructor(
     }
 
 
-    @OptIn(ExperimentalNotificationsApi::class)
     private fun sendNotification(
         notifications: List<GetNotificationsQuery.Notification>
     ) {
+
+        val deepLinkIntent = Intent(
+            Intent.ACTION_VIEW,
+            "myapp://notificationRoute".toUri(),
+            context,
+            MainActivity::class.java
+        )
+
+        val deepLinkPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
+            addNextIntentWithParentStack(deepLinkIntent)
+            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        }
+
+
         val stringBuilder = StringBuilder()
         for (notification in notifications) {
             stringBuilder.appendLine(notificationToText(notification))
@@ -85,6 +102,7 @@ class NotificationWorker @AssistedInject constructor(
             .setSmallIcon(R.drawable.white_notification_icon)
             .setStyle(bigTextStyle)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(deepLinkPendingIntent)
 
         val notificationManager = ContextCompat.getSystemService(
             context,
