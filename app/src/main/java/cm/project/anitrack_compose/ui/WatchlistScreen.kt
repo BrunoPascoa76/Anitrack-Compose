@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -42,6 +43,7 @@ fun WatchlistScreen(
 ) {
     val selectedIndex by watchListViewModel.selectedStatus.collectAsState()
     val isBeingRateLimited by watchListViewModel.isBeingRateLimited.collectAsState()
+
     Scaffold(
         topBar = {
             Column {
@@ -66,7 +68,12 @@ fun WatchlistScreen(
         },
         bottomBar = { BottomNavBar(navController) }
     ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
+        Box(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
             val possibleStatuses =
                 listOf(MediaListStatus.CURRENT, MediaListStatus.PLANNING, MediaListStatus.COMPLETED)
             when (selectedIndex) {
@@ -86,6 +93,7 @@ fun WatchListScreen(
     watchListViewModel: WatchListViewModel = hiltViewModel()
 ) {
     val watchlist by watchListViewModel.watchlist.collectAsState()
+    val isLoading by watchListViewModel.isLoading.collectAsState()
 
     LaunchedEffect(Unit) {
         watchListViewModel.startRefreshing(mediaListStatus)
@@ -97,42 +105,47 @@ fun WatchListScreen(
         }
     }
 
-    if (watchlist.isNotEmpty()) {
-        LazyVerticalStaggeredGrid(
-            columns = StaggeredGridCells.Fixed(2),
-            contentPadding = PaddingValues(5.dp),
-            modifier = Modifier.padding(5.dp),
-            verticalItemSpacing = 10.dp,
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            items(watchlist.size) { index ->
-                val entry = watchlist[index]
-                if (entry != null) {
-                    AnimeGridCard(
-                        navController = navController,
-                        unwatchedEpisodes = if (mediaListStatus == MediaListStatus.CURRENT)
-                            max(
-                                0,
-                                ((entry.media?.nextAiringEpisode?.episode ?: entry.media?.episodes
-                                ?: 1) - (entry.progress
-                                    ?: 0) - 1)
-                            ) else 0,
-                        title = entry.media?.title?.english ?: entry.media?.title?.native
-                        ?: entry.media?.title?.userPreferred ?: "",
-                        id = entry.media?.id ?: 0,
-                        imageUrl = entry.media?.coverImage?.large
-                    )
+    if (!isLoading) {
+        if (watchlist.isNotEmpty()) {
+            LazyVerticalStaggeredGrid(
+                columns = StaggeredGridCells.Fixed(2),
+                contentPadding = PaddingValues(5.dp),
+                modifier = Modifier.padding(5.dp),
+                verticalItemSpacing = 10.dp,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                items(watchlist.size) { index ->
+                    val entry = watchlist[index]
+                    if (entry != null) {
+                        AnimeGridCard(
+                            navController = navController,
+                            unwatchedEpisodes = if (mediaListStatus == MediaListStatus.CURRENT)
+                                max(
+                                    0,
+                                    ((entry.media?.nextAiringEpisode?.episode
+                                        ?: entry.media?.episodes
+                                        ?: 1) - (entry.progress
+                                        ?: 0) - 1)
+                                ) else 0,
+                            title = entry.media?.title?.english ?: entry.media?.title?.native
+                            ?: entry.media?.title?.userPreferred ?: "",
+                            id = entry.media?.id ?: 0,
+                            imageUrl = entry.media?.coverImage?.large
+                        )
+                    }
                 }
+            }
+        } else {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text("(╥﹏╥)", style = MaterialTheme.typography.headlineLarge.copy(fontSize = 50.sp))
+                Text("No anime in your watchlist", style = MaterialTheme.typography.bodyLarge)
             }
         }
     } else {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text("(╥﹏╥)", style = MaterialTheme.typography.headlineLarge.copy(fontSize = 50.sp))
-            Text("No anime in your watchlist", style = MaterialTheme.typography.bodyLarge)
-        }
+        CircularProgressIndicator()
     }
 }

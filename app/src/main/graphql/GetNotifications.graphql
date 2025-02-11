@@ -1,0 +1,54 @@
+query GetNotifications($page: Int){
+    Page(page: $page, perPage: 25) {
+        notifications(type_in: [AIRING,MEDIA_DATA_CHANGE,RELATED_MEDIA_ADDITION],resetNotificationCount: true) {
+            ... on AiringNotification {
+                episode
+                media {
+                    id
+                    coverImage {
+                        large
+                    }
+                    title {
+                        english
+                        native
+                        userPreferred
+                    }
+                }
+                type
+            }
+            ... on RelatedMediaAdditionNotification {
+                media {
+                    id
+                    coverImage {
+                        large
+                    }
+                    title {
+                        english
+                        native
+                        userPreferred
+                    }
+                }
+                type
+            }
+            ... on MediaDataChangeNotification {
+                media {
+                    id
+                    coverImage {
+                        large
+                    }
+                    title {
+                        english
+                        native
+                        userPreferred
+                    }
+                }
+                type
+            }
+        }
+        pageInfo {
+            hasNextPage
+            currentPage
+            lastPage
+        }
+    }
+}

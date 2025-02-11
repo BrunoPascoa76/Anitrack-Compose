@@ -6,10 +6,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navDeepLink
 import cm.project.anitrack_compose.ui.APISetupScreen
 import cm.project.anitrack_compose.ui.CalendarScreen
 import cm.project.anitrack_compose.ui.DiscoverScreen
 import cm.project.anitrack_compose.ui.MediaDetailsScreen
+import cm.project.anitrack_compose.ui.NotificationScreen
+import cm.project.anitrack_compose.ui.ProfileScreen
 import cm.project.anitrack_compose.ui.SearchScreen
 import cm.project.anitrack_compose.ui.WatchlistScreen
 import cm.project.anitrack_compose.ui.components.GraphQLWrapper
@@ -35,7 +38,7 @@ fun AppNavHost(
             }
         }
         composable("profile") {
-
+            ProfileScreen(navController = navController)
         }
         composable("calendar") {
             GraphQLWrapper(preferencesViewModel) {
@@ -58,6 +61,15 @@ fun AppNavHost(
             val query = it.arguments?.getString("query")
             GraphQLWrapper(preferencesViewModel) {
                 SearchScreen(navController = navController, query = query ?: "")
+            }
+        }
+
+        composable(
+            route = "notifications",
+            deepLinks = listOf(navDeepLink { uriPattern = "myapp://notificationroute" })
+        ) {
+            GraphQLWrapper(preferencesViewModel) {
+                NotificationScreen(navController = navController)
             }
         }
 

@@ -24,6 +24,9 @@ class WatchListViewModel @Inject constructor(private val graphQLRepository: Grap
 
     private var _userId: Int? = null
 
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading = _isLoading.asStateFlow()
+
     private val _watchlist: MutableStateFlow<List<Entry?>> = MutableStateFlow(emptyList())
     val watchlist = _watchlist.asStateFlow()
 
@@ -55,6 +58,7 @@ class WatchListViewModel @Inject constructor(private val graphQLRepository: Grap
     }
 
     private suspend fun refresh(status: MediaListStatus) {
+        _isLoading.value = true
         _isBeingRateLimited.value = false
         if (_userId == null) {
             when (val result = graphQLRepository.getUserId()) {
@@ -63,6 +67,7 @@ class WatchListViewModel @Inject constructor(private val graphQLRepository: Grap
                 }
 
                 is Result.Error -> {
+                    _isLoading.value = false
                     if (result.exception is ApolloHttpException && result.exception.statusCode == 429) {
                         _isBeingRateLimited.value = true
                     }
@@ -77,6 +82,7 @@ class WatchListViewModel @Inject constructor(private val graphQLRepository: Grap
                     orderByUnwatched(result.data.lists?.get(0)?.entries ?: emptyList())
                 } else {
                     _watchlist.value = result.data.lists?.get(0)?.entries ?: emptyList()
+                    _isLoading.value = false
                 }
             }
 
@@ -84,6 +90,7 @@ class WatchListViewModel @Inject constructor(private val graphQLRepository: Grap
                 if (result.exception is ApolloHttpException && result.exception.statusCode == 429) {
                     _isBeingRateLimited.value = true
                 }
+                _isLoading.value = false
             }
         }
     }
@@ -97,6 +104,7 @@ class WatchListViewModel @Inject constructor(private val graphQLRepository: Grap
                     ?: 1) - (it?.progress ?: 0) - 1)
                 )
             }
+        _isLoading.value = false
     }
 
 }

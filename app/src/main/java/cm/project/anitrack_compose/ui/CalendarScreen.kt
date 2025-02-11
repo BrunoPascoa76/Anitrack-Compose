@@ -1,6 +1,7 @@
 package cm.project.anitrack_compose.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -41,6 +43,7 @@ fun CalendarScreen(navController: NavController) {
     val calendarViewModel: CalendarViewModel = hiltViewModel()
     val calendarFilterWatchlist by calendarViewModel.calendarFilterWatchlist.collectAsState(initial = false)
     val selectedIndex by calendarViewModel.selectedIndex.collectAsState()
+    val isLoading by calendarViewModel.isLoading.collectAsState()
 
     LaunchedEffect(Unit) {
         calendarViewModel.startRefreshing()
@@ -90,7 +93,18 @@ fun CalendarScreen(navController: NavController) {
         },
         bottomBar = { BottomNavBar(navController) }
     ) { innerPadding ->
-        Calendar(navController, calendarViewModel, Modifier.padding(innerPadding))
+        if (!isLoading) {
+            Calendar(navController, calendarViewModel, Modifier.padding(innerPadding))
+        } else {
+            Box(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
     }
 }
 
