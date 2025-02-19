@@ -50,6 +50,7 @@ class NotificationWorker @AssistedInject constructor(
                 when (val result = graphQLRepository.getUnreadNotifications()) {
                     is Result_.Success -> {
                         if (result.data.isNotEmpty()) {
+                            preferencesRepository.incrementAlreadyDisplayedNotifications(result.data.size)
                             sendNotification(result.data)
                         }
                     }

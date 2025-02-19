@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -21,6 +22,8 @@ class PreferencesRepository @Inject constructor(@ApplicationContext private val 
         private val ACCESS_TOKEN = stringPreferencesKey("access_token")
         private val ACCESS_TOKEN_EXPIRATION = longPreferencesKey("access_token_expiration")
         private val CALENDAR_FILTER_WATCHLIST = booleanPreferencesKey("calendar_filter_watchlist")
+        private val ALREADY_DISPLAYED_NOTIFICATIONS =
+            intPreferencesKey("already_displayed_notifications")
     }
 
     val clientId: Flow<String?> = context.dataStore.data.map { preferences ->
@@ -41,6 +44,10 @@ class PreferencesRepository @Inject constructor(@ApplicationContext private val 
 
     val calendarFilterWatchlist: Flow<Boolean> = context.dataStore.data.map { preferences ->
         preferences[CALENDAR_FILTER_WATCHLIST] ?: false
+    }
+
+    val alreadyDisplayedNotifications: Flow<Int> = context.dataStore.data.map { preferences ->
+        preferences[ALREADY_DISPLAYED_NOTIFICATIONS] ?: 0
     }
 
     suspend fun saveClientId(clientId: String) {
@@ -81,6 +88,19 @@ class PreferencesRepository @Inject constructor(@ApplicationContext private val 
                 preferences.remove(ACCESS_TOKEN)
                 preferences.remove(ACCESS_TOKEN_EXPIRATION)
             }
+        }
+    }
+
+    suspend fun incrementAlreadyDisplayedNotifications(amount: Int = 1) {
+        context.dataStore.edit { preferences ->
+            val currentValue = preferences[ALREADY_DISPLAYED_NOTIFICATIONS] ?: 0
+            preferences[ALREADY_DISPLAYED_NOTIFICATIONS] = currentValue + amount
+        }
+    }
+
+    suspend fun resetAlreadyDisplayedNotifications() {
+        context.dataStore.edit { preferences ->
+            preferences[ALREADY_DISPLAYED_NOTIFICATIONS] = 0
         }
     }
 }

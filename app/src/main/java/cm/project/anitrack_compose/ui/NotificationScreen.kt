@@ -1,5 +1,6 @@
 package cm.project.anitrack_compose.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,17 +10,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +38,7 @@ import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import cm.project.anitrack_compose.graphql.GetNotificationsQuery
+import cm.project.anitrack_compose.ui.components.BottomNavBar
 import cm.project.anitrack_compose.viewModels.NotificationViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -48,22 +49,25 @@ fun NotificationScreen(navController: NavController) {
     var isRateLimited by remember { mutableStateOf(false) }
     val notificationViewModel: NotificationViewModel = hiltViewModel()
     val pager = notificationViewModel.pager.collectAsLazyPagingItems()
+    val notificationBadgeCount by notificationViewModel.notificationBadgeCount.collectAsState()
+
+    DisposableEffect(Unit) {
+        onDispose {
+            notificationViewModel.resetAlreadyDisplayedNotifications()
+        }
+    }
 
     Scaffold(
-        topBar = {
-            TopAppBar(title = {
-                IconButton(onClick = { navController.navigateUp() }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                }
-            }
-            )
-        },
+        bottomBar = {
+            BottomNavBar(navController = navController)
+        }
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier.padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(5.dp)
         ) {
             items(pager.itemCount) { item ->
+                val isUnread = item < notificationBadgeCount
                 pager[item]?.let { notification ->
                     val title = notificationToText(notification)
                     val imageUrl = when (notification.__typename) {
@@ -91,7 +95,7 @@ fun NotificationScreen(navController: NavController) {
                         }
                     }
 
-                    ListItem(text = title, imageUrl = imageUrl) { action() }
+                    ListItem(text = title, imageUrl = imageUrl, isUnread) { action() }
                 }
             }
             pager.apply {
@@ -152,16 +156,25 @@ private fun notificationToText(notification: GetNotificationsQuery.Notification)
 }
 
 @Composable
-fun ListItem(text: String, imageUrl: String? = null, action: () -> Unit) {
+fun ListItem(
+    text: String,
+    imageUrl: String? = null,
+    isUnread: Boolean = false,
+    action: () -> Unit
+) {
     ElevatedCard(
         modifier = Modifier
             .padding(horizontal = 5.dp, vertical = 5.dp)
             .height(120.dp)
             .clickable { action() },
     ) {
+        val backgroundColor =
+            if (isUnread) MaterialTheme.colorScheme.surfaceColorAtElevation(elevation = 4.dp) else MaterialTheme.colorScheme.surface
         Row(
-            modifier = Modifier.fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier
+                .fillMaxSize()
+                .background(backgroundColor),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             if (imageUrl != null) {
                 AsyncImage(

@@ -12,7 +12,6 @@ import cm.project.anitrack_compose.ui.CalendarScreen
 import cm.project.anitrack_compose.ui.DiscoverScreen
 import cm.project.anitrack_compose.ui.MediaDetailsScreen
 import cm.project.anitrack_compose.ui.NotificationScreen
-import cm.project.anitrack_compose.ui.ProfileScreen
 import cm.project.anitrack_compose.ui.SearchScreen
 import cm.project.anitrack_compose.ui.WatchlistScreen
 import cm.project.anitrack_compose.ui.components.GraphQLWrapper
@@ -36,9 +35,6 @@ fun AppNavHost(
                     navController = navController
                 )
             }
-        }
-        composable("profile") {
-            ProfileScreen(navController = navController)
         }
         composable("calendar") {
             GraphQLWrapper(preferencesViewModel) {
