@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -29,7 +30,8 @@ fun BottomNavBar(navController: NavController) {
             selected = currentRoute == "watchlist",
             onClick = {
                 if (currentRoute != "watchlist") navController.navigate("watchlist")
-            }
+            },
+            alwaysShowLabel = false
         )
         NavigationBarItem(
             icon = { Icon(Icons.Filled.CalendarMonth, contentDescription = "Calendar") },
@@ -37,15 +39,17 @@ fun BottomNavBar(navController: NavController) {
             selected = currentRoute == "calendar",
             onClick = {
                 if (currentRoute != "calendar") navController.navigate("calendar")
-            }
+            },
+            alwaysShowLabel = false
         )
         NavigationBarItem(
             icon = { NotificationBell() },
-            label = { Text("Notifications") },
+            label = { Text("Notification") },
             selected = currentRoute == "notifications",
             onClick = {
                 if (currentRoute != "notifications") navController.navigate("notifications")
-            }
+            },
+            alwaysShowLabel = false
         )
         NavigationBarItem(
             icon = { Icon(Icons.Filled.Explore, contentDescription = "Explore") },
@@ -53,7 +57,17 @@ fun BottomNavBar(navController: NavController) {
             selected = currentRoute == "explore",
             onClick = {
                 if (currentRoute != "explore") navController.navigate("explore")
-            }
+            },
+            alwaysShowLabel = false
+        )
+        NavigationBarItem(
+            icon = { Icon(Icons.Filled.Settings, contentDescription = "Settings") },
+            label = { Text("Settings") },
+            selected = currentRoute == "settings",
+            onClick = {
+                if (currentRoute != "settings") navController.navigate("settings")
+            },
+            alwaysShowLabel = false
         )
     }
 }
