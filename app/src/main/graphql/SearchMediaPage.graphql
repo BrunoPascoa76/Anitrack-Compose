@@ -1,11 +1,12 @@
-query SearchMediaPage($page: Int, $search: String) {
+query SearchMediaPage($page: Int, $search: String,$isAdult:Boolean=true) {
     Page(page: $page, perPage: 20) {
-        media(sort: SEARCH_MATCH, search: $search, type: ANIME) {
+        media(sort: SEARCH_MATCH, search: $search, type: ANIME,isAdult: $isAdult) {
             id
             episodes
             title {
                 english
                 native
+                romaji
                 userPreferred
             }
             coverImage {

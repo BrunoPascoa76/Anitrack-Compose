@@ -7,6 +7,7 @@ mutation SaveMediaDetails($mediaId: Int, $mediaListEntryId: Int, $startedAt: Fuz
             title {
                 english
                 native
+                romaji
                 userPreferred
             }
         }

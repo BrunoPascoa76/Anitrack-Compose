@@ -1,11 +1,12 @@
-query DiscoverMediaPage($page: Int, $sort: [MediaSort], $seasonYear: Int, $season: MediaSeason) {
+query DiscoverMediaPage($page: Int, $sort: [MediaSort], $seasonYear: Int, $season: MediaSeason,$isAdult:Boolean) {
     Page(page: $page, perPage: 20) {
-        media(sort: $sort, seasonYear: $seasonYear, season: $season) {
+        media(sort: $sort, seasonYear: $seasonYear, season: $season,isAdult: $isAdult) {
             id
             episodes
             title {
                 english
                 native
+                romaji
                 userPreferred
             }
             coverImage {

@@ -13,6 +13,7 @@ query GetMediaDetails($mediaId: Int) {
         title {
             english
             native
+            romaji
             userPreferred
         }
         tags {
@@ -35,6 +36,7 @@ query GetMediaDetails($mediaId: Int) {
                     title {
                         english
                         native
+                        romaji
                         userPreferred
                     }
                     coverImage {
@@ -54,6 +56,7 @@ query GetMediaDetails($mediaId: Int) {
                 title {
                     english
                     native
+                    romaji
                     userPreferred
                 }
                 coverImage {
