@@ -24,6 +24,7 @@ class PreferencesRepository @Inject constructor(@ApplicationContext private val 
         private val CALENDAR_FILTER_WATCHLIST = booleanPreferencesKey("calendar_filter_watchlist")
         private val ALREADY_DISPLAYED_NOTIFICATIONS =
             intPreferencesKey("already_displayed_notifications")
+        private val FILTER_ADULT = booleanPreferencesKey("filter_adult")
     }
 
     val clientId: Flow<String?> = context.dataStore.data.map { preferences ->
@@ -48,6 +49,10 @@ class PreferencesRepository @Inject constructor(@ApplicationContext private val 
 
     val alreadyDisplayedNotifications: Flow<Int> = context.dataStore.data.map { preferences ->
         preferences[ALREADY_DISPLAYED_NOTIFICATIONS] ?: 0
+    }
+
+    val filterAdult: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[FILTER_ADULT] ?: false
     }
 
     suspend fun saveClientId(clientId: String) {
@@ -101,6 +106,12 @@ class PreferencesRepository @Inject constructor(@ApplicationContext private val 
     suspend fun resetAlreadyDisplayedNotifications() {
         context.dataStore.edit { preferences ->
             preferences[ALREADY_DISPLAYED_NOTIFICATIONS] = 0
+        }
+    }
+
+    suspend fun saveFilterAdult(filter: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[FILTER_ADULT] = filter
         }
     }
 }
